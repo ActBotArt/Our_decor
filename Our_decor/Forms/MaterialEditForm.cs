@@ -1,9 +1,9 @@
 ﻿using System;
+using System.Collections.Generic;
 using System.Data;
+using System.Data.SqlClient;
 using System.Drawing;
 using System.Windows.Forms;
-using System.Data.SqlClient;
-using Our_decor.Models;
 using Our_decor.Services;
 
 namespace Our_decor.Forms
@@ -11,235 +11,262 @@ namespace Our_decor.Forms
     public partial class MaterialEditForm : Form
     {
         private readonly int _productId;
-        private readonly int? _materialId;
         private readonly DatabaseService _db;
-        private readonly bool _isEditing;
         private bool _isDragging = false;
         private Point _dragCursorPoint;
         private Point _dragFormPoint;
 
-        public MaterialEditForm(int productId, int? materialId = null)
+        public MaterialEditForm(int productId)
         {
             InitializeComponent();
             _productId = productId;
-            _materialId = materialId;
             _db = DatabaseService.Instance;
-            _isEditing = materialId.HasValue;
-
-            ConfigureForm();
+            SetupForm();
             LoadMaterialTypes();
-            if (_isEditing)
-            {
-                LoadMaterial();
-            }
         }
 
-        private void ConfigureForm()
+        private void SetupForm()
         {
-            this.Text = _isEditing ? "Редактирование материала" : "Добавление материала";
+            this.Text = "Добавление материала";
             lblTitle.Text = this.Text;
+
+            this.BackColor = Color.FromArgb(187, 217, 178);
+            panelTop.BackColor = Color.FromArgb(45, 96, 51);
+
+            foreach (Button button in new[] { btnSave, btnCancel, btnClose })
+            {
+                button.BackColor = Color.FromArgb(45, 96, 51);
+                button.ForeColor = Color.White;
+                button.Font = new Font("Gabriola", 14F);
+                button.FlatStyle = FlatStyle.Flat;
+                button.FlatAppearance.BorderSize = 0;
+            }
+
+            foreach (Label label in new[] { lblMaterialType, lblMaterialName, lblQuantity,
+                                          lblCost, lblUnit, lblStockQuantity, lblMinQuantity })
+            {
+                label.Font = new Font("Gabriola", 14F);
+                label.ForeColor = Color.FromArgb(45, 96, 51);
+            }
+
+            foreach (TextBox textBox in new[] { txtMaterialName, txtQuantity, txtCost,
+                                              txtUnit, txtStockQuantity, txtMinQuantity })
+            {
+                textBox.Font = new Font("Gabriola", 12F);
+                textBox.BackColor = Color.White;
+                textBox.TextChanged += ValidateInput;
+            }
+
+            txtQuantity.Text = "0";
+            txtCost.Text = "0";
+            txtStockQuantity.Text = "0";
+            txtMinQuantity.Text = "0";
+
+            cmbMaterialType.Font = new Font("Gabriola", 12F);
+            cmbMaterialType.SelectedIndexChanged += ValidateInput;
+
+            panelTop.MouseDown += (s, e) =>
+            {
+                if (e.Button == MouseButtons.Left)
+                {
+                    _isDragging = true;
+                    _dragCursorPoint = Cursor.Position;
+                    _dragFormPoint = this.Location;
+                }
+            };
+
+            panelTop.MouseMove += (s, e) =>
+            {
+                if (_isDragging)
+                {
+                    Point dif = Point.Subtract(Cursor.Position, new Size(_dragCursorPoint));
+                    this.Location = Point.Add(_dragFormPoint, new Size(dif));
+                }
+            };
+
+            panelTop.MouseUp += (s, e) => _isDragging = false;
+
+            ValidateInput(null, EventArgs.Empty);
         }
 
         private async void LoadMaterialTypes()
         {
             try
             {
-                var query = "SELECT Id, TypeName FROM MaterialTypes ORDER BY TypeName";
-                var dataTable = await _db.ExecuteQueryAsync(query);
+                Cursor = Cursors.WaitCursor;
 
-                cboMaterialType.DataSource = dataTable;
-                cboMaterialType.DisplayMember = "TypeName";
-                cboMaterialType.ValueMember = "Id";
+                var query = "SELECT * FROM MaterialTypes ORDER BY TypeName";
+                var dt = await _db.ExecuteQueryAsync(query);
+
+                cmbMaterialType.DataSource = dt;
+                cmbMaterialType.DisplayMember = "TypeName";
+                cmbMaterialType.ValueMember = "Id";
             }
             catch (Exception ex)
             {
-                MessageBox.Show($"Ошибка загрузки типов материалов: {ex.Message}",
+                MessageBox.Show($"Ошибка при загрузке типов материалов: {ex.Message}",
                     "Ошибка", MessageBoxButtons.OK, MessageBoxIcon.Error);
+                DialogResult = DialogResult.Cancel;
+                Close();
+            }
+            finally
+            {
+                Cursor = Cursors.Default;
             }
         }
 
-        private async void CboMaterialType_SelectedIndexChanged(object sender, EventArgs e)
+        private void ValidateInput(object sender, EventArgs e)
         {
-            if (cboMaterialType.SelectedValue == null) return;
+            bool isValid = true;
 
-            try
+            if (string.IsNullOrWhiteSpace(txtMaterialName.Text))
             {
-                var typeId = Convert.ToInt32(cboMaterialType.SelectedValue);
-                var query = @"
-                    SELECT Id, Name 
-                    FROM Materials 
-                    WHERE MaterialTypeId = @TypeId 
-                    ORDER BY Name";
-
-                var parameter = new SqlParameter("@TypeId", typeId);
-                var dataTable = await _db.ExecuteQueryAsync(query, parameter);
-
-                cboMaterial.DataSource = dataTable;
-                cboMaterial.DisplayMember = "Name";
-                cboMaterial.ValueMember = "Id";
+                isValid = false;
+                txtMaterialName.BackColor = Color.MistyRose;
             }
-            catch (Exception ex)
+            else
             {
-                MessageBox.Show($"Ошибка загрузки материалов: {ex.Message}",
-                    "Ошибка", MessageBoxButtons.OK, MessageBoxIcon.Error);
+                txtMaterialName.BackColor = SystemColors.Window;
             }
+
+            if (cmbMaterialType.SelectedItem == null)
+            {
+                isValid = false;
+                cmbMaterialType.BackColor = Color.MistyRose;
+            }
+            else
+            {
+                cmbMaterialType.BackColor = SystemColors.Window;
+            }
+
+            if (!decimal.TryParse(txtQuantity.Text, out decimal quantity) || quantity <= 0)
+            {
+                isValid = false;
+                txtQuantity.BackColor = Color.MistyRose;
+            }
+            else
+            {
+                txtQuantity.BackColor = SystemColors.Window;
+            }
+
+            if (!decimal.TryParse(txtCost.Text, out decimal cost) || cost <= 0)
+            {
+                isValid = false;
+                txtCost.BackColor = Color.MistyRose;
+            }
+            else
+            {
+                txtCost.BackColor = SystemColors.Window;
+            }
+
+            if (string.IsNullOrWhiteSpace(txtUnit.Text))
+            {
+                isValid = false;
+                txtUnit.BackColor = Color.MistyRose;
+            }
+            else
+            {
+                txtUnit.BackColor = SystemColors.Window;
+            }
+
+            if (!decimal.TryParse(txtStockQuantity.Text, out decimal stockQuantity) || stockQuantity < 0)
+            {
+                isValid = false;
+                txtStockQuantity.BackColor = Color.MistyRose;
+            }
+            else
+            {
+                txtStockQuantity.BackColor = SystemColors.Window;
+            }
+
+            if (!decimal.TryParse(txtMinQuantity.Text, out decimal minQuantity) || minQuantity < 0)
+            {
+                isValid = false;
+                txtMinQuantity.BackColor = Color.MistyRose;
+            }
+            else
+            {
+                txtMinQuantity.BackColor = SystemColors.Window;
+            }
+
+            btnSave.Enabled = isValid;
         }
 
-        private async void LoadMaterial()
+        private async void btnSave_Click(object sender, EventArgs e)
         {
-            if (!_materialId.HasValue) return;
-
             try
             {
-                var query = @"
-                    SELECT m.*, mt.Id as TypeId, pm.Quantity
-                    FROM Materials m
-                    JOIN MaterialTypes mt ON m.MaterialTypeId = mt.Id
-                    JOIN ProductMaterials pm ON m.Id = pm.MaterialId
-                    WHERE pm.ProductId = @ProductId AND m.Id = @MaterialId";
+                btnSave.Enabled = false;
+                Cursor = Cursors.WaitCursor;
+
+                var materialTypeId = ((DataRowView)cmbMaterialType.SelectedItem)["Id"];
+                var quantity = decimal.Parse(txtQuantity.Text);
+                var cost = decimal.Parse(txtCost.Text);
+                var stockQuantity = decimal.Parse(txtStockQuantity.Text);
+                var minQuantity = decimal.Parse(txtMinQuantity.Text);
+
+                var insertMaterialQuery = @"
+                    INSERT INTO Materials (Name, MaterialTypeId, Cost, Unit, StockQuantity, MinQuantity)
+                    OUTPUT INSERTED.Id
+                    VALUES (@Name, @MaterialTypeId, @Cost, @Unit, @StockQuantity, @MinQuantity)";
 
                 var parameters = new[]
                 {
-                    new SqlParameter("@ProductId", _productId),
-                    new SqlParameter("@MaterialId", _materialId.Value)
+                    new SqlParameter("@Name", txtMaterialName.Text.Trim()),
+                    new SqlParameter("@MaterialTypeId", materialTypeId),
+                    new SqlParameter("@Cost", cost),
+                    new SqlParameter("@Unit", txtUnit.Text.Trim()),
+                    new SqlParameter("@StockQuantity", stockQuantity),
+                    new SqlParameter("@MinQuantity", minQuantity)
                 };
 
-                var dataTable = await _db.ExecuteQueryAsync(query, parameters);
-                if (dataTable.Rows.Count > 0)
+                var materialId = await _db.ExecuteScalarAsync(insertMaterialQuery, parameters);
+
+                if (materialId != null)
                 {
-                    var row = dataTable.Rows[0];
-                    cboMaterialType.SelectedValue = row["TypeId"];
-                    cboMaterial.SelectedValue = row["Id"];
-                    txtQuantity.Text = row["Quantity"].ToString();
-                }
-            }
-            catch (Exception ex)
-            {
-                MessageBox.Show($"Ошибка загрузки данных материала: {ex.Message}",
-                    "Ошибка", MessageBoxButtons.OK, MessageBoxIcon.Error);
-            }
-        }
-
-        private async void BtnSave_Click(object sender, EventArgs e)
-        {
-            try
-            {
-                if (cboMaterial.SelectedValue == null)
-                {
-                    MessageBox.Show("Выберите материал",
-                        "Внимание", MessageBoxButtons.OK, MessageBoxIcon.Warning);
-                    return;
-                }
-
-                if (!decimal.TryParse(txtQuantity.Text, out decimal quantity) || quantity <= 0)
-                {
-                    MessageBox.Show("Введите корректное количество",
-                        "Внимание", MessageBoxButtons.OK, MessageBoxIcon.Warning);
-                    return;
-                }
-
-                var materialId = Convert.ToInt32(cboMaterial.SelectedValue);
-
-                if (_isEditing)
-                {
-                    var updateQuery = @"
-                        UPDATE ProductMaterials 
-                        SET MaterialId = @MaterialId,
-                            Quantity = @Quantity
-                        WHERE ProductId = @ProductId 
-                          AND MaterialId = @OldMaterialId";
-
-                    var updateParams = new[]
-                    {
-                        new SqlParameter("@ProductId", _productId),
-                        new SqlParameter("@MaterialId", materialId),
-                        new SqlParameter("@Quantity", quantity),
-                        new SqlParameter("@OldMaterialId", _materialId.Value)
-                    };
-
-                    await _db.ExecuteNonQueryAsync(updateQuery, updateParams);
-                }
-                else
-                {
-                    // Проверяем, не существует ли уже такой материал
-                    var checkQuery = @"
-                        SELECT COUNT(*) 
-                        FROM ProductMaterials 
-                        WHERE ProductId = @ProductId 
-                          AND MaterialId = @MaterialId";
-
-                    var checkParams = new[]
-                    {
-                        new SqlParameter("@ProductId", _productId),
-                        new SqlParameter("@MaterialId", materialId)
-                    };
-
-                    var exists = Convert.ToInt32(await _db.ExecuteScalarAsync(checkQuery, checkParams)) > 0;
-
-                    if (exists)
-                    {
-                        MessageBox.Show("Этот материал уже добавлен к продукту",
-                            "Внимание", MessageBoxButtons.OK, MessageBoxIcon.Warning);
-                        return;
-                    }
-
-                    var insertQuery = @"
+                    var insertProductMaterialQuery = @"
                         INSERT INTO ProductMaterials (ProductId, MaterialId, Quantity)
                         VALUES (@ProductId, @MaterialId, @Quantity)";
 
-                    var insertParams = new[]
+                    parameters = new[]
                     {
                         new SqlParameter("@ProductId", _productId),
                         new SqlParameter("@MaterialId", materialId),
                         new SqlParameter("@Quantity", quantity)
                     };
 
-                    await _db.ExecuteNonQueryAsync(insertQuery, insertParams);
-                }
+                    await _db.ExecuteNonQueryAsync(insertProductMaterialQuery, parameters);
 
-                DialogResult = DialogResult.OK;
-                Close();
+                    DialogResult = DialogResult.OK;
+                    Close();
+                }
             }
             catch (Exception ex)
             {
                 MessageBox.Show($"Ошибка при сохранении: {ex.Message}",
                     "Ошибка", MessageBoxButtons.OK, MessageBoxIcon.Error);
             }
+            finally
+            {
+                Cursor = Cursors.Default;
+                btnSave.Enabled = true;
+            }
         }
 
-        private void BtnCancel_Click(object sender, EventArgs e)
+        private void btnCancel_Click(object sender, EventArgs e)
         {
             DialogResult = DialogResult.Cancel;
             Close();
         }
 
-        private void BtnClose_Click(object sender, EventArgs e)
+        protected override bool ProcessDialogKey(Keys keyData)
         {
-            Close();
-        }
-
-        private void PanelTop_MouseDown(object sender, MouseEventArgs e)
-        {
-            if (e.Button == MouseButtons.Left)
+            if (keyData == Keys.Escape)
             {
-                _isDragging = true;
-                _dragCursorPoint = Cursor.Position;
-                _dragFormPoint = this.Location;
+                btnCancel_Click(this, EventArgs.Empty);
+                return true;
             }
-        }
-
-        private void PanelTop_MouseMove(object sender, MouseEventArgs e)
-        {
-            if (_isDragging)
-            {
-                Point dif = Point.Subtract(Cursor.Position, new Size(_dragCursorPoint));
-                this.Location = Point.Add(_dragFormPoint, new Size(dif));
-            }
-        }
-
-        private void PanelTop_MouseUp(object sender, MouseEventArgs e)
-        {
-            _isDragging = false;
+            return base.ProcessDialogKey(keyData);
         }
     }
 }

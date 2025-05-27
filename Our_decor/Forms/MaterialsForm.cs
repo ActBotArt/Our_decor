@@ -29,6 +29,20 @@ namespace Our_decor.Forms
 
             InitializeComponent();
 
+            try
+            {
+                string iconPath = Path.Combine(Application.StartupPath, "..", "..", "Resources", "icon.ico");
+                if (File.Exists(iconPath))
+                {
+                    this.Icon = new Icon(iconPath);
+                    this.ShowIcon = true;
+                }
+            }
+            catch (Exception ex)
+            {
+                Debug.WriteLine($"Ошибка при загрузке иконки: {ex.Message}");
+            }
+
             _product = product;
             _db = DatabaseService.Instance;
             _userRole = userRole ?? "User";
@@ -42,10 +56,10 @@ namespace Our_decor.Forms
         private void InitializeTimer()
         {
             _timer = new Timer();
-            _timer.Interval = 1000; // 1 секунда
+            _timer.Interval = 1000;
             _timer.Tick += Timer_Tick;
             _timer.Start();
-            UpdateDateTime(); // Первоначальное обновление
+            UpdateDateTime();
         }
 
         private void Timer_Tick(object sender, EventArgs e)
@@ -55,8 +69,8 @@ namespace Our_decor.Forms
 
         private void UpdateDateTime()
         {
-            lblDateTime.Text = $"Current Date and Time (UTC - YYYY-MM-DD HH:MM:SS formatted): {DateTime.UtcNow:yyyy-MM-dd HH:mm:ss}";
-            lblUser.Text = $"Current User's Login: {_currentUser}";
+            lblDateTime.Text = $"Дата и время: {DateTime.Now:dd.MM.yyyy HH:mm:ss}";
+            lblUser.Text = $"Пользователь: {_currentUser}";
         }
 
         private void ConfigureForm()
@@ -67,14 +81,12 @@ namespace Our_decor.Forms
             this.AutoSizeMode = AutoSizeMode.GrowAndShrink;
             this.MinimumSize = new Size(800, 600);
 
-            // Настройка верхней панели
             panelTop.Height = 45;
             panelTop.Padding = new Padding(12, 5, 120, 5);
             panelTop.MouseDown += PanelTop_MouseDown;
             panelTop.MouseMove += PanelTop_MouseMove;
             panelTop.MouseUp += PanelTop_MouseUp;
 
-            // Настройка заголовка
             lblTitle.Text = this.Text;
             lblTitle.AutoEllipsis = true;
             lblTitle.MaximumSize = new Size(panelTop.Width - 150, 35);
@@ -84,7 +96,6 @@ namespace Our_decor.Forms
             lblTitle.Location = new Point(12, 5);
             lblTitle.Anchor = AnchorStyles.Left | AnchorStyles.Top;
 
-            // Настройка кнопки закрытия
             btnClose.BackColor = Color.FromArgb(45, 96, 51);
             btnClose.ForeColor = Color.White;
             btnClose.Font = new Font("Gabriola", 14F);
@@ -97,34 +108,14 @@ namespace Our_decor.Forms
             btnClose.FlatAppearance.MouseOverBackColor = Color.FromArgb(60, 130, 70);
             btnClose.FlatAppearance.MouseDownBackColor = Color.FromArgb(35, 75, 40);
 
-            // Настройка DataGridView
             SetupDataGridView();
 
-            // Настройка логотипа
-            try
-            {
-                string logoPath = Path.Combine(Application.StartupPath, "..", "..", "Resources", "logo.png");
-                if (File.Exists(logoPath))
-                {
-                    pictureBoxLogo.Image = Image.FromFile(logoPath);
-                    pictureBoxLogo.Location = new Point(
-                        this.ClientSize.Width - pictureBoxLogo.Width - 20,
-                        this.ClientSize.Height - pictureBoxLogo.Height - 70 // Учитываем высоту статусной строки
-                    );
-                    pictureBoxLogo.BringToFront();
-                }
-            }
-            catch (Exception ex)
-            {
-                Debug.WriteLine($"Ошибка при загрузке логотипа: {ex.Message}");
-            }
-
-            // Настройка статусной строки
             statusStrip.BackColor = Color.FromArgb(187, 217, 178);
             lblDateTime.Font = new Font("Segoe UI", 9F);
+            lblDateTime.ForeColor = Color.FromArgb(45, 96, 51);
             lblUser.Font = new Font("Segoe UI", 9F);
+            lblUser.ForeColor = Color.FromArgb(45, 96, 51);
 
-            // Настройка видимости элементов для администратора
             btnAdd.Visible = _userRole.Equals("Admin", StringComparison.OrdinalIgnoreCase);
             dataGridView.ReadOnly = !_userRole.Equals("Admin", StringComparison.OrdinalIgnoreCase);
         }
@@ -146,7 +137,6 @@ namespace Our_decor.Forms
             dataGridView.CellBorderStyle = DataGridViewCellBorderStyle.SingleHorizontal;
             dataGridView.AutoSizeColumnsMode = DataGridViewAutoSizeColumnsMode.Fill;
 
-            // Настройка заголовков
             dataGridView.ColumnHeadersDefaultCellStyle.BackColor = Color.FromArgb(45, 96, 51);
             dataGridView.ColumnHeadersDefaultCellStyle.ForeColor = Color.White;
             dataGridView.ColumnHeadersDefaultCellStyle.Font = new Font("Gabriola", 14F, FontStyle.Bold);
@@ -154,7 +144,6 @@ namespace Our_decor.Forms
             dataGridView.ColumnHeadersHeight = 40;
             dataGridView.EnableHeadersVisualStyles = false;
 
-            // Настройка строк
             dataGridView.RowTemplate.Height = 35;
             dataGridView.AlternatingRowsDefaultCellStyle.BackColor = Color.FromArgb(242, 247, 240);
             dataGridView.DefaultCellStyle.SelectionBackColor = Color.FromArgb(187, 217, 178);
@@ -375,10 +364,25 @@ namespace Our_decor.Forms
             {
                 pictureBoxLogo.Location = new Point(
                     this.ClientSize.Width - pictureBoxLogo.Width - 20,
-                    this.ClientSize.Height - pictureBoxLogo.Height - 70 // Учитываем высоту статусной строки
+                    this.ClientSize.Height - pictureBoxLogo.Height - 70
                 );
                 pictureBoxLogo.BringToFront();
             }
+        }
+
+        protected override void Dispose(bool disposing)
+        {
+            if (disposing)
+            {
+                if (components != null)
+                    components.Dispose();
+
+                if (pictureBoxLogo?.Image != null)
+                    pictureBoxLogo.Image.Dispose();
+
+                _timer?.Dispose();
+            }
+            base.Dispose(disposing);
         }
     }
 }

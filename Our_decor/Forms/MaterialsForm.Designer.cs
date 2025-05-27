@@ -2,9 +2,6 @@
 {
     partial class MaterialsForm
     {
-        /// <summary>
-        /// Required designer variable.
-        /// </summary>
         private System.ComponentModel.IContainer components = null;
         private System.Windows.Forms.Panel panelTop;
         private System.Windows.Forms.Label lblTitle;
@@ -16,25 +13,6 @@
         private System.Windows.Forms.StatusStrip statusStrip;
         private System.Windows.Forms.ToolStripStatusLabel lblDateTime;
         private System.Windows.Forms.ToolStripStatusLabel lblUser;
-
-        /// <summary>
-        /// Clean up any resources being used.
-        /// </summary>
-        /// <param name="disposing">true if managed resources should be disposed; otherwise, false.</param>
-        protected override void Dispose(bool disposing)
-        {
-            if (disposing && (components != null))
-            {
-                components.Dispose();
-                if (pictureBoxLogo?.Image != null)
-                {
-                    pictureBoxLogo.Image.Dispose();
-                }
-            }
-            base.Dispose(disposing);
-        }
-
-        #region Windows Form Designer generated code
 
         private void InitializeComponent()
         {
@@ -55,7 +33,6 @@
             this.statusStrip.SuspendLayout();
             this.SuspendLayout();
 
-            // panelTop
             this.panelTop.BackColor = System.Drawing.Color.FromArgb(((int)(((byte)(187)))), ((int)(((byte)(217)))), ((int)(((byte)(178)))));
             this.panelTop.Controls.Add(this.lblTitle);
             this.panelTop.Controls.Add(this.btnClose);
@@ -66,7 +43,6 @@
             this.panelTop.TabIndex = 0;
             this.panelTop.Padding = new System.Windows.Forms.Padding(12, 5, 120, 5);
 
-            // lblTitle
             this.lblTitle.AutoSize = true;
             this.lblTitle.Font = new System.Drawing.Font("Gabriola", 16F, System.Drawing.FontStyle.Bold);
             this.lblTitle.ForeColor = System.Drawing.Color.FromArgb(((int)(((byte)(45)))), ((int)(((byte)(96)))), ((int)(((byte)(51)))));
@@ -76,7 +52,6 @@
             this.lblTitle.TabIndex = 0;
             this.lblTitle.Text = "Материалы";
 
-            // btnClose
             this.btnClose.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Right)));
             this.btnClose.BackColor = System.Drawing.Color.FromArgb(((int)(((byte)(45)))), ((int)(((byte)(96)))), ((int)(((byte)(51)))));
             this.btnClose.FlatStyle = System.Windows.Forms.FlatStyle.Flat;
@@ -91,7 +66,6 @@
             this.btnClose.FlatAppearance.BorderSize = 0;
             this.btnClose.Click += new System.EventHandler(this.btnClose_Click);
 
-            // btnAdd
             this.btnAdd.BackColor = System.Drawing.Color.FromArgb(((int)(((byte)(45)))), ((int)(((byte)(96)))), ((int)(((byte)(51)))));
             this.btnAdd.FlatStyle = System.Windows.Forms.FlatStyle.Flat;
             this.btnAdd.Font = new System.Drawing.Font("Gabriola", 14F);
@@ -106,7 +80,6 @@
             this.btnAdd.Click += new System.EventHandler(this.btnAdd_Click);
             this.btnAdd.Visible = false;
 
-            // dataGridView
             this.dataGridView.Anchor = ((System.Windows.Forms.AnchorStyles)((((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Bottom)
             | System.Windows.Forms.AnchorStyles.Left)
             | System.Windows.Forms.AnchorStyles.Right)));
@@ -118,7 +91,6 @@
             this.dataGridView.TabIndex = 3;
             this.dataGridView.RowHeadersVisible = false;
 
-            // lblTotal
             this.lblTotal.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Left)));
             this.lblTotal.AutoSize = true;
             this.lblTotal.Font = new System.Drawing.Font("Gabriola", 14F);
@@ -129,7 +101,6 @@
             this.lblTotal.TabIndex = 4;
             this.lblTotal.Text = "Всего материалов: 0";
 
-            // pictureBoxLogo
             this.pictureBoxLogo.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Right)));
             this.pictureBoxLogo.BackColor = System.Drawing.Color.Transparent;
             this.pictureBoxLogo.Location = new System.Drawing.Point(668, 458);
@@ -139,7 +110,6 @@
             this.pictureBoxLogo.TabIndex = 5;
             this.pictureBoxLogo.TabStop = false;
 
-            // statusStrip
             this.statusStrip.BackColor = System.Drawing.Color.FromArgb(((int)(((byte)(187)))), ((int)(((byte)(217)))), ((int)(((byte)(178)))));
             this.statusStrip.Items.AddRange(new System.Windows.Forms.ToolStripItem[] {
                 this.lblDateTime,
@@ -151,21 +121,18 @@
             this.statusStrip.TabIndex = 6;
             this.statusStrip.SizingGrip = false;
 
-            // lblDateTime
             this.lblDateTime.Font = new System.Drawing.Font("Segoe UI", 9F);
             this.lblDateTime.Name = "lblDateTime";
             this.lblDateTime.Size = new System.Drawing.Size(350, 17);
+            this.lblDateTime.Text = "Current Date and Time (UTC): ";
             this.lblDateTime.Padding = new System.Windows.Forms.Padding(5, 0, 0, 0);
-            this.lblDateTime.Text = "Дата: ";
 
-            // lblUser
             this.lblUser.Font = new System.Drawing.Font("Segoe UI", 9F);
             this.lblUser.Name = "lblUser";
             this.lblUser.Size = new System.Drawing.Size(200, 17);
-            this.lblUser.Text = "Пользователь: ";
+            this.lblUser.Text = "Current User's Login: ";
             this.lblUser.Padding = new System.Windows.Forms.Padding(15, 0, 0, 0);
 
-            // MaterialsForm
             this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
             this.BackColor = System.Drawing.Color.White;
@@ -191,7 +158,5 @@
             this.ResumeLayout(false);
             this.PerformLayout();
         }
-
-        #endregion
     }
 }

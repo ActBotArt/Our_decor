@@ -2,15 +2,8 @@
 {
     partial class MaterialEditForm
     {
-        /// <summary>
-        /// Required designer variable.
-        /// </summary>
         private System.ComponentModel.IContainer components = null;
 
-        /// <summary>
-        /// Clean up any resources being used.
-        /// </summary>
-        /// <param name="disposing">true if managed resources should be disposed; otherwise, false.</param>
         protected override void Dispose(bool disposing)
         {
             if (disposing && (components != null))
@@ -20,203 +13,236 @@
             base.Dispose(disposing);
         }
 
-        #region Windows Form Designer generated code
-
-        /// <summary>
-        /// Required method for Designer support - do not modify
-        /// the contents of this method with the code editor.
-        /// </summary>
         private void InitializeComponent()
         {
-            this.components = new System.ComponentModel.Container();
-
             this.panelTop = new System.Windows.Forms.Panel();
             this.lblTitle = new System.Windows.Forms.Label();
             this.btnClose = new System.Windows.Forms.Button();
-            this.panelMain = new System.Windows.Forms.Panel();
             this.lblMaterialType = new System.Windows.Forms.Label();
-            this.cboMaterialType = new System.Windows.Forms.ComboBox();
-            this.lblMaterial = new System.Windows.Forms.Label();
-            this.cboMaterial = new System.Windows.Forms.ComboBox();
+            this.cmbMaterialType = new System.Windows.Forms.ComboBox();
+            this.lblMaterialName = new System.Windows.Forms.Label();
+            this.txtMaterialName = new System.Windows.Forms.TextBox();
             this.lblQuantity = new System.Windows.Forms.Label();
             this.txtQuantity = new System.Windows.Forms.TextBox();
+            this.lblCost = new System.Windows.Forms.Label();
+            this.txtCost = new System.Windows.Forms.TextBox();
+            this.lblUnit = new System.Windows.Forms.Label();
+            this.txtUnit = new System.Windows.Forms.TextBox();
+            this.lblStockQuantity = new System.Windows.Forms.Label();
+            this.txtStockQuantity = new System.Windows.Forms.TextBox();
+            this.lblMinQuantity = new System.Windows.Forms.Label();
+            this.txtMinQuantity = new System.Windows.Forms.TextBox();
             this.btnSave = new System.Windows.Forms.Button();
             this.btnCancel = new System.Windows.Forms.Button();
+            this.statusStrip = new System.Windows.Forms.StatusStrip();
+            this.lblDateTime = new System.Windows.Forms.ToolStripStatusLabel();
+            this.lblUser = new System.Windows.Forms.ToolStripStatusLabel();
 
             this.panelTop.SuspendLayout();
-            this.panelMain.SuspendLayout();
+            this.statusStrip.SuspendLayout();
             this.SuspendLayout();
 
             // panelTop
-            this.panelTop.BackColor = System.Drawing.Color.FromArgb(((int)(((byte)(187)))), ((int)(((byte)(217)))), ((int)(((byte)(178)))));
+            this.panelTop.BackColor = System.Drawing.Color.FromArgb(45, 96, 51);
             this.panelTop.Controls.Add(this.lblTitle);
             this.panelTop.Controls.Add(this.btnClose);
             this.panelTop.Dock = System.Windows.Forms.DockStyle.Top;
-            this.panelTop.Location = new System.Drawing.Point(0, 0);
-            this.panelTop.Name = "panelTop";
-            this.panelTop.Size = new System.Drawing.Size(500, 45);
-            this.panelTop.TabIndex = 0;
-            this.panelTop.Padding = new System.Windows.Forms.Padding(12, 5, 12, 5);
-            this.panelTop.MouseDown += new System.Windows.Forms.MouseEventHandler(this.PanelTop_MouseDown);
-            this.panelTop.MouseMove += new System.Windows.Forms.MouseEventHandler(this.PanelTop_MouseMove);
-            this.panelTop.MouseUp += new System.Windows.Forms.MouseEventHandler(this.PanelTop_MouseUp);
+            this.panelTop.Height = 40;
 
             // lblTitle
             this.lblTitle.AutoSize = true;
-            this.lblTitle.Font = new System.Drawing.Font("Gabriola", 16F, System.Drawing.FontStyle.Bold);
-            this.lblTitle.ForeColor = System.Drawing.Color.FromArgb(((int)(((byte)(45)))), ((int)(((byte)(96)))), ((int)(((byte)(51)))));
-            this.lblTitle.Location = new System.Drawing.Point(12, 5);
-            this.lblTitle.Name = "lblTitle";
-            this.lblTitle.Size = new System.Drawing.Size(200, 35);
-            this.lblTitle.TabIndex = 0;
-            this.lblTitle.Text = "Редактирование материала";
+            this.lblTitle.Font = new System.Drawing.Font("Gabriola", 16F);
+            this.lblTitle.ForeColor = System.Drawing.Color.White;
+            this.lblTitle.Location = new System.Drawing.Point(10, 5);
+            this.lblTitle.Text = "Добавление материала";
 
             // btnClose
             this.btnClose.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Right)));
-            this.btnClose.BackColor = System.Drawing.Color.FromArgb(((int)(((byte)(45)))), ((int)(((byte)(96)))), ((int)(((byte)(51)))));
             this.btnClose.FlatStyle = System.Windows.Forms.FlatStyle.Flat;
-            this.btnClose.Font = new System.Drawing.Font("Arial", 12F);
-            this.btnClose.ForeColor = System.Drawing.Color.White;
-            this.btnClose.Location = new System.Drawing.Point(448, 5);
-            this.btnClose.Name = "btnClose";
-            this.btnClose.Size = new System.Drawing.Size(40, 35);
-            this.btnClose.TabIndex = 1;
-            this.btnClose.Text = "✕";
-            this.btnClose.UseVisualStyleBackColor = false;
             this.btnClose.FlatAppearance.BorderSize = 0;
-            this.btnClose.Click += new System.EventHandler(this.BtnClose_Click);
-
-            // panelMain
-            this.panelMain.Dock = System.Windows.Forms.DockStyle.Fill;
-            this.panelMain.Location = new System.Drawing.Point(0, 45);
-            this.panelMain.Name = "panelMain";
-            this.panelMain.Size = new System.Drawing.Size(500, 295);
-            this.panelMain.TabIndex = 1;
-            this.panelMain.Padding = new System.Windows.Forms.Padding(20);
+            this.btnClose.Font = new System.Drawing.Font("Gabriola", 14F);
+            this.btnClose.ForeColor = System.Drawing.Color.White;
+            this.btnClose.Location = new System.Drawing.Point(460, 0);
+            this.btnClose.Size = new System.Drawing.Size(40, 40);
+            this.btnClose.Text = "×";
+            this.btnClose.Click += new System.EventHandler(this.btnCancel_Click);
 
             // lblMaterialType
             this.lblMaterialType.AutoSize = true;
             this.lblMaterialType.Font = new System.Drawing.Font("Gabriola", 14F);
-            this.lblMaterialType.Location = new System.Drawing.Point(20, 20);
-            this.lblMaterialType.Name = "lblMaterialType";
-            this.lblMaterialType.Size = new System.Drawing.Size(150, 35);
-            this.lblMaterialType.TabIndex = 0;
+            this.lblMaterialType.Location = new System.Drawing.Point(20, 60);
             this.lblMaterialType.Text = "Тип материала:";
 
-            // cboMaterialType
-            this.cboMaterialType.DropDownStyle = System.Windows.Forms.ComboBoxStyle.DropDownList;
-            this.cboMaterialType.Font = new System.Drawing.Font("Gabriola", 12F);
-            this.cboMaterialType.Location = new System.Drawing.Point(20, 50);
-            this.cboMaterialType.Name = "cboMaterialType";
-            this.cboMaterialType.Size = new System.Drawing.Size(400, 35);
-            this.cboMaterialType.TabIndex = 1;
-            this.cboMaterialType.SelectedIndexChanged += new System.EventHandler(this.CboMaterialType_SelectedIndexChanged);
+            // cmbMaterialType
+            this.cmbMaterialType.Font = new System.Drawing.Font("Gabriola", 12F);
+            this.cmbMaterialType.Location = new System.Drawing.Point(150, 60);
+            this.cmbMaterialType.Size = new System.Drawing.Size(320, 30);
+            this.cmbMaterialType.DropDownStyle = System.Windows.Forms.ComboBoxStyle.DropDownList;
 
-            // lblMaterial
-            this.lblMaterial.AutoSize = true;
-            this.lblMaterial.Font = new System.Drawing.Font("Gabriola", 14F);
-            this.lblMaterial.Location = new System.Drawing.Point(20, 90);
-            this.lblMaterial.Name = "lblMaterial";
-            this.lblMaterial.Size = new System.Drawing.Size(150, 35);
-            this.lblMaterial.TabIndex = 2;
-            this.lblMaterial.Text = "Материал:";
+            // lblMaterialName
+            this.lblMaterialName.AutoSize = true;
+            this.lblMaterialName.Font = new System.Drawing.Font("Gabriola", 14F);
+            this.lblMaterialName.Location = new System.Drawing.Point(20, 100);
+            this.lblMaterialName.Text = "Наименование:";
 
-            // cboMaterial
-            this.cboMaterial.DropDownStyle = System.Windows.Forms.ComboBoxStyle.DropDownList;
-            this.cboMaterial.Font = new System.Drawing.Font("Gabriola", 12F);
-            this.cboMaterial.Location = new System.Drawing.Point(20, 120);
-            this.cboMaterial.Name = "cboMaterial";
-            this.cboMaterial.Size = new System.Drawing.Size(400, 35);
-            this.cboMaterial.TabIndex = 3;
+            // txtMaterialName
+            this.txtMaterialName.Font = new System.Drawing.Font("Gabriola", 12F);
+            this.txtMaterialName.Location = new System.Drawing.Point(150, 100);
+            this.txtMaterialName.Size = new System.Drawing.Size(320, 30);
 
             // lblQuantity
             this.lblQuantity.AutoSize = true;
             this.lblQuantity.Font = new System.Drawing.Font("Gabriola", 14F);
-            this.lblQuantity.Location = new System.Drawing.Point(20, 160);
-            this.lblQuantity.Name = "lblQuantity";
-            this.lblQuantity.Size = new System.Drawing.Size(150, 35);
-            this.lblQuantity.TabIndex = 4;
+            this.lblQuantity.Location = new System.Drawing.Point(20, 140);
             this.lblQuantity.Text = "Количество:";
 
             // txtQuantity
             this.txtQuantity.Font = new System.Drawing.Font("Gabriola", 12F);
-            this.txtQuantity.Location = new System.Drawing.Point(20, 190);
-            this.txtQuantity.Name = "txtQuantity";
-            this.txtQuantity.Size = new System.Drawing.Size(400, 35);
-            this.txtQuantity.TabIndex = 5;
+            this.txtQuantity.Location = new System.Drawing.Point(150, 140);
+            this.txtQuantity.Size = new System.Drawing.Size(150, 30);
+
+            // lblCost
+            this.lblCost.AutoSize = true;
+            this.lblCost.Font = new System.Drawing.Font("Gabriola", 14F);
+            this.lblCost.Location = new System.Drawing.Point(20, 180);
+            this.lblCost.Text = "Цена:";
+
+            // txtCost
+            this.txtCost.Font = new System.Drawing.Font("Gabriola", 12F);
+            this.txtCost.Location = new System.Drawing.Point(150, 180);
+            this.txtCost.Size = new System.Drawing.Size(150, 30);
+
+            // lblUnit
+            this.lblUnit.AutoSize = true;
+            this.lblUnit.Font = new System.Drawing.Font("Gabriola", 14F);
+            this.lblUnit.Location = new System.Drawing.Point(20, 220);
+            this.lblUnit.Text = "Единица измерения:";
+
+            // txtUnit
+            this.txtUnit.Font = new System.Drawing.Font("Gabriola", 12F);
+            this.txtUnit.Location = new System.Drawing.Point(150, 220);
+            this.txtUnit.Size = new System.Drawing.Size(150, 30);
+
+            // lblStockQuantity
+            this.lblStockQuantity.AutoSize = true;
+            this.lblStockQuantity.Font = new System.Drawing.Font("Gabriola", 14F);
+            this.lblStockQuantity.Location = new System.Drawing.Point(20, 260);
+            this.lblStockQuantity.Text = "Количество на складе:";
+
+            // txtStockQuantity
+            this.txtStockQuantity.Font = new System.Drawing.Font("Gabriola", 12F);
+            this.txtStockQuantity.Location = new System.Drawing.Point(150, 260);
+            this.txtStockQuantity.Size = new System.Drawing.Size(150, 30);
+
+            // lblMinQuantity
+            this.lblMinQuantity.AutoSize = true;
+            this.lblMinQuantity.Font = new System.Drawing.Font("Gabriola", 14F);
+            this.lblMinQuantity.Location = new System.Drawing.Point(20, 300);
+            this.lblMinQuantity.Text = "Минимальное количество:";
+
+            // txtMinQuantity
+            this.txtMinQuantity.Font = new System.Drawing.Font("Gabriola", 12F);
+            this.txtMinQuantity.Location = new System.Drawing.Point(150, 300);
+            this.txtMinQuantity.Size = new System.Drawing.Size(150, 30);
 
             // btnSave
-            this.btnSave.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Right)));
-            this.btnSave.BackColor = System.Drawing.Color.FromArgb(((int)(((byte)(45)))), ((int)(((byte)(96)))), ((int)(((byte)(51)))));
+            this.btnSave.BackColor = System.Drawing.Color.FromArgb(45, 96, 51);
             this.btnSave.FlatStyle = System.Windows.Forms.FlatStyle.Flat;
+            this.btnSave.FlatAppearance.BorderSize = 0;
             this.btnSave.Font = new System.Drawing.Font("Gabriola", 14F);
             this.btnSave.ForeColor = System.Drawing.Color.White;
-            this.btnSave.Location = new System.Drawing.Point(240, 240);
-            this.btnSave.Name = "btnSave";
-            this.btnSave.Size = new System.Drawing.Size(120, 35);
-            this.btnSave.TabIndex = 6;
+            this.btnSave.Location = new System.Drawing.Point(100, 350);
+            this.btnSave.Size = new System.Drawing.Size(140, 40);
             this.btnSave.Text = "Сохранить";
-            this.btnSave.UseVisualStyleBackColor = false;
-            this.btnSave.FlatAppearance.BorderSize = 0;
-            this.btnSave.Click += new System.EventHandler(this.BtnSave_Click);
+            this.btnSave.Click += new System.EventHandler(this.btnSave_Click);
 
             // btnCancel
-            this.btnCancel.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Right)));
-            this.btnCancel.BackColor = System.Drawing.Color.FromArgb(((int)(((byte)(96)))), ((int)(((byte)(45)))), ((int)(((byte)(45)))));
+            this.btnCancel.BackColor = System.Drawing.Color.FromArgb(45, 96, 51);
             this.btnCancel.FlatStyle = System.Windows.Forms.FlatStyle.Flat;
+            this.btnCancel.FlatAppearance.BorderSize = 0;
             this.btnCancel.Font = new System.Drawing.Font("Gabriola", 14F);
             this.btnCancel.ForeColor = System.Drawing.Color.White;
-            this.btnCancel.Location = new System.Drawing.Point(370, 240);
-            this.btnCancel.Name = "btnCancel";
-            this.btnCancel.Size = new System.Drawing.Size(120, 35);
-            this.btnCancel.TabIndex = 7;
+            this.btnCancel.Location = new System.Drawing.Point(260, 350);
+            this.btnCancel.Size = new System.Drawing.Size(140, 40);
             this.btnCancel.Text = "Отмена";
-            this.btnCancel.UseVisualStyleBackColor = false;
-            this.btnCancel.FlatAppearance.BorderSize = 0;
-            this.btnCancel.Click += new System.EventHandler(this.BtnCancel_Click);
+            this.btnCancel.Click += new System.EventHandler(this.btnCancel_Click);
+
+            // statusStrip
+            this.statusStrip.BackColor = System.Drawing.Color.FromArgb(187, 217, 178);
+            this.statusStrip.Items.AddRange(new System.Windows.Forms.ToolStripItem[] {
+                this.lblDateTime,
+                new System.Windows.Forms.ToolStripSeparator(),
+                this.lblUser
+            });
+            this.statusStrip.Location = new System.Drawing.Point(0, 428);
+            this.statusStrip.Name = "statusStrip";
+            this.statusStrip.Size = new System.Drawing.Size(500, 22);
+
+            // lblDateTime
+            this.lblDateTime.Font = new System.Drawing.Font("Gabriola", 12F);
+            this.lblDateTime.ForeColor = System.Drawing.Color.FromArgb(45, 96, 51);
+
+            // lblUser
+            this.lblUser.Font = new System.Drawing.Font("Gabriola", 12F);
+            this.lblUser.ForeColor = System.Drawing.Color.FromArgb(45, 96, 51);
 
             // MaterialEditForm
             this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
-            this.BackColor = System.Drawing.Color.White;
-            this.ClientSize = new System.Drawing.Size(500, 340);
-            this.Controls.Add(this.btnCancel);
-            this.Controls.Add(this.btnSave);
-            this.Controls.Add(this.txtQuantity);
-            this.Controls.Add(this.lblQuantity);
-            this.Controls.Add(this.cboMaterial);
-            this.Controls.Add(this.lblMaterial);
-            this.Controls.Add(this.cboMaterialType);
-            this.Controls.Add(this.lblMaterialType);
-            this.Controls.Add(this.panelMain);
-            this.Controls.Add(this.panelTop);
+            this.BackColor = System.Drawing.Color.FromArgb(187, 217, 178);
+            this.ClientSize = new System.Drawing.Size(500, 450);
+            this.Controls.AddRange(new System.Windows.Forms.Control[] {
+                this.panelTop,
+                this.lblMaterialType,
+                this.cmbMaterialType,
+                this.lblMaterialName,
+                this.txtMaterialName,
+                this.lblQuantity,
+                this.txtQuantity,
+                this.lblCost,
+                this.txtCost,
+                this.lblUnit,
+                this.txtUnit,
+                this.lblStockQuantity,
+                this.txtStockQuantity,
+                this.lblMinQuantity,
+                this.txtMinQuantity,
+                this.btnSave,
+                this.btnCancel,
+                this.statusStrip
+            });
             this.FormBorderStyle = System.Windows.Forms.FormBorderStyle.None;
-            this.MinimumSize = new System.Drawing.Size(500, 340);
-            this.Name = "MaterialEditForm";
             this.StartPosition = System.Windows.Forms.FormStartPosition.CenterParent;
-            this.Text = "Редактирование материала";
 
             this.panelTop.ResumeLayout(false);
             this.panelTop.PerformLayout();
-            this.panelMain.ResumeLayout(false);
-            this.panelMain.PerformLayout();
+            this.statusStrip.ResumeLayout(false);
+            this.statusStrip.PerformLayout();
             this.ResumeLayout(false);
             this.PerformLayout();
         }
 
-        #endregion
-
         private System.Windows.Forms.Panel panelTop;
         private System.Windows.Forms.Label lblTitle;
         private System.Windows.Forms.Button btnClose;
-        private System.Windows.Forms.Panel panelMain;
         private System.Windows.Forms.Label lblMaterialType;
-        private System.Windows.Forms.ComboBox cboMaterialType;
-        private System.Windows.Forms.Label lblMaterial;
-        private System.Windows.Forms.ComboBox cboMaterial;
+        private System.Windows.Forms.ComboBox cmbMaterialType;
+        private System.Windows.Forms.Label lblMaterialName;
+        private System.Windows.Forms.TextBox txtMaterialName;
         private System.Windows.Forms.Label lblQuantity;
         private System.Windows.Forms.TextBox txtQuantity;
+        private System.Windows.Forms.Label lblCost;
+        private System.Windows.Forms.TextBox txtCost;
+        private System.Windows.Forms.Label lblUnit;
+        private System.Windows.Forms.TextBox txtUnit;
+        private System.Windows.Forms.Label lblStockQuantity;
+        private System.Windows.Forms.TextBox txtStockQuantity;
+        private System.Windows.Forms.Label lblMinQuantity;
+        private System.Windows.Forms.TextBox txtMinQuantity;
         private System.Windows.Forms.Button btnSave;
         private System.Windows.Forms.Button btnCancel;
+        private System.Windows.Forms.StatusStrip statusStrip;
+        private System.Windows.Forms.ToolStripStatusLabel lblDateTime;
+        private System.Windows.Forms.ToolStripStatusLabel lblUser;
     }
 }
