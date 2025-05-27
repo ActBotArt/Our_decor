@@ -2,6 +2,7 @@
 using System.Data;
 using System.Data.SqlClient;
 using System.Threading.Tasks;
+using System.Diagnostics;
 
 namespace Our_decor.Services
 {
@@ -12,7 +13,7 @@ namespace Our_decor.Services
 
         private DatabaseService()
         {
-            connectionString = "Server=.\\SQLEXPRESS;Database=decorDB;Trusted_Connection=True;";
+            connectionString = @"Data Source=LAPTOP-G0UUB676\SQLEXPRESS01;Initial Catalog=decorDB;Integrated Security=True;MultipleActiveResultSets=True;TrustServerCertificate=True";
         }
 
         public static DatabaseService Instance
@@ -27,57 +28,103 @@ namespace Our_decor.Services
             }
         }
 
-        public async Task<DataTable> ExecuteQueryAsync(string query, params SqlParameter[] parameters)
+        public async Task<bool> TestConnectionAsync()
         {
-            using (var connection = new SqlConnection(connectionString))
+            try
             {
-                await connection.OpenAsync();
-                using (var command = new SqlCommand(query, connection))
+                using (var connection = new SqlConnection(connectionString))
                 {
-                    if (parameters != null)
+                    await connection.OpenAsync();
+                    using (var command = new SqlCommand("SELECT 1", connection))
                     {
-                        command.Parameters.AddRange(parameters);
+                        await command.ExecuteScalarAsync();
+                        Debug.WriteLine("Подключение успешно установлено");
+                        return true;
                     }
-
-                    var dataTable = new DataTable();
-                    using (var adapter = new SqlDataAdapter(command))
-                    {
-                        await Task.Run(() => adapter.Fill(dataTable));
-                    }
-                    return dataTable;
                 }
+            }
+            catch (Exception ex)
+            {
+                Debug.WriteLine($"Ошибка подключения: {ex.Message}");
+                return false;
             }
         }
 
-        public async Task<object> ExecuteScalarAsync(string query, params SqlParameter[] parameters)
+        public async Task<DataTable> ExecuteQueryAsync(string query, params SqlParameter[] parameters)
         {
-            using (var connection = new SqlConnection(connectionString))
+            try
             {
-                await connection.OpenAsync();
-                using (var command = new SqlCommand(query, connection))
+                using (var connection = new SqlConnection(connectionString))
                 {
-                    if (parameters != null)
+                    await connection.OpenAsync();
+                    using (var command = new SqlCommand(query, connection))
                     {
-                        command.Parameters.AddRange(parameters);
+                        if (parameters != null)
+                        {
+                            command.Parameters.AddRange(parameters);
+                        }
+
+                        var dataTable = new DataTable();
+                        using (var reader = await command.ExecuteReaderAsync())
+                        {
+                            dataTable.Load(reader);
+                        }
+                        return dataTable;
                     }
-                    return await command.ExecuteScalarAsync();
                 }
+            }
+            catch (Exception ex)
+            {
+                Debug.WriteLine($"Ошибка выполнения запроса: {ex.Message}");
+                throw;
             }
         }
 
         public async Task<int> ExecuteNonQueryAsync(string query, params SqlParameter[] parameters)
         {
-            using (var connection = new SqlConnection(connectionString))
+            try
             {
-                await connection.OpenAsync();
-                using (var command = new SqlCommand(query, connection))
+                using (var connection = new SqlConnection(connectionString))
                 {
-                    if (parameters != null)
+                    await connection.OpenAsync();
+                    using (var command = new SqlCommand(query, connection))
                     {
-                        command.Parameters.AddRange(parameters);
+                        if (parameters != null)
+                        {
+                            command.Parameters.AddRange(parameters);
+                        }
+                        return await command.ExecuteNonQueryAsync();
                     }
-                    return await command.ExecuteNonQueryAsync();
                 }
+            }
+            catch (Exception ex)
+            {
+                Debug.WriteLine($"Ошибка выполнения запроса: {ex.Message}");
+                throw;
+            }
+        }
+
+        public async Task<object> ExecuteScalarAsync(string query, params SqlParameter[] parameters)
+        {
+            try
+            {
+                using (var connection = new SqlConnection(connectionString))
+                {
+                    await connection.OpenAsync();
+                    using (var command = new SqlCommand(query, connection))
+                    {
+                        if (parameters != null)
+                        {
+                            command.Parameters.AddRange(parameters);
+                        }
+                        return await command.ExecuteScalarAsync();
+                    }
+                }
+            }
+            catch (Exception ex)
+            {
+                Debug.WriteLine($"Ошибка выполнения скалярного запроса: {ex.Message}");
+                throw;
             }
         }
     }

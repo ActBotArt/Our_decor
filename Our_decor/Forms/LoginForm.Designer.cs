@@ -62,7 +62,7 @@ namespace Our_decor.Forms
             this.txtPassword.Location = new Point(130, 183);
             this.txtPassword.Size = new Size(140, 25);
             this.txtPassword.Font = new Font("Segoe UI", 9F);
-            this.txtPassword.Text = "admin";
+            this.txtPassword.Text = "admin123";
             this.txtPassword.UseSystemPasswordChar = true;
             this.txtPassword.PasswordChar = '●';
 

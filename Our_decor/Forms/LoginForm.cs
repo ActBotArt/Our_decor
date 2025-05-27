@@ -3,6 +3,7 @@ using System.IO;
 using System.Drawing;
 using System.Windows.Forms;
 using System.Threading.Tasks;
+using System.Diagnostics;
 using Our_decor.Services;
 
 namespace Our_decor.Forms
@@ -48,15 +49,39 @@ namespace Our_decor.Forms
                 btnLogin.Enabled = false;
                 Cursor = Cursors.WaitCursor;
 
-                if (await authService.ValidateUserAsync(txtLogin.Text, txtPassword.Text))
+                string login = txtLogin.Text.Trim();
+                string password = txtPassword.Text.Trim();
+
+                Debug.WriteLine($"Попытка входа:");
+                Debug.WriteLine($"Логин: '{login}'");
+                Debug.WriteLine($"Пароль: '{password}'");
+
+                if (string.IsNullOrWhiteSpace(login) || string.IsNullOrWhiteSpace(password))
                 {
-                    string role = await authService.GetUserRoleAsync(txtLogin.Text);
+                    MessageBox.Show("Введите логин и пароль!",
+                        "Внимание", MessageBoxButtons.OK, MessageBoxIcon.Warning);
+                    return;
+                }
+
+                // Проверяем подключение к БД
+                if (!await DatabaseService.Instance.TestConnectionAsync())
+                {
+                    MessageBox.Show("Нет подключения к базе данных!",
+                        "Ошибка", MessageBoxButtons.OK, MessageBoxIcon.Error);
+                    return;
+                }
+
+                if (await authService.ValidateUserAsync(login, password))
+                {
+                    string role = await authService.GetUserRoleAsync(login);
+                    Debug.WriteLine($"Успешный вход. Роль: {role}");
                     this.Hide();
                     new MainForm(role).ShowDialog();
                     this.Close();
                 }
                 else
                 {
+                    Debug.WriteLine("Неудачная попытка входа");
                     MessageBox.Show("Неверный логин или пароль!",
                         "Ошибка", MessageBoxButtons.OK, MessageBoxIcon.Error);
                     txtPassword.Text = "";
@@ -65,6 +90,7 @@ namespace Our_decor.Forms
             }
             catch (Exception ex)
             {
+                Debug.WriteLine($"Исключение при входе: {ex}");
                 MessageBox.Show($"Ошибка при входе: {ex.Message}",
                     "Ошибка", MessageBoxButtons.OK, MessageBoxIcon.Error);
             }

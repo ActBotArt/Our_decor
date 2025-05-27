@@ -1,0 +1,5 @@
+Install-Package Microsoft.EntityFrameworkCore
+Install-Package Microsoft.EntityFrameworkCore.SqlServer
+Install-Package Microsoft.Extensions.DependencyInjection
+Install-Package System.Configuration.ConfigurationManager
+Install-Package EntityFramework

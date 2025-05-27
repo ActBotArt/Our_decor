@@ -21,7 +21,7 @@ namespace Our_decor
         public string Description { get; set; }
         public decimal MinPartnerCost { get; set; }
         public decimal RollWidth { get; set; }
-        public decimal MaterialCost { get; set; }
+        public Nullable<decimal> MaterialCost { get; set; }
         public Nullable<int> ProductionTime { get; set; }
         public Nullable<int> WorkshopNumber { get; set; }
         public Nullable<int> WorkersCount { get; set; }

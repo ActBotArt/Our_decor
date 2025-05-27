@@ -1,126 +1,140 @@
 ﻿using System;
+using System.Collections.Generic;
 using System.Data;
+using System.Data.SqlClient;
 using System.Drawing;
 using System.Windows.Forms;
-using System.Threading.Tasks;
-using System.Collections.Generic;
 using Our_decor.Models;
+using Our_decor.Services;
 
 namespace Our_decor.Forms
 {
     public partial class ProductForm : Form
     {
-        private bool isDragging = false;
-        private Point lastCursor;
-        private Point lastForm;
-        private bool isNewProduct;
-        private readonly Product existingProduct;
+        private readonly Product _product;
+        private readonly DatabaseService _db;
+        private bool _isNewProduct;
+        private bool _isDragging = false;
+        private Point _dragCursorPoint;
+        private Point _dragFormPoint;
+
+        public Product Result { get; private set; }
 
         public ProductForm(Product product = null)
         {
             InitializeComponent();
-            existingProduct = product;
-            isNewProduct = (existingProduct == null);
-            InitializeProductTypes();
+            _product = product;
+            _db = DatabaseService.Instance;
+            _isNewProduct = product == null;
             SetupForm();
-            SetupEvents();
+            LoadProductTypes();
         }
 
-        private async void InitializeProductTypes()
+        private void SetupForm()
+        {
+            // Настройка формы
+            this.Text = _isNewProduct ? "Добавление продукции" : "Редактирование продукции";
+            lblTitle.Text = this.Text;
+
+            // Настройка внешнего вида
+            this.BackColor = Color.FromArgb(187, 217, 178);
+            panelTop.BackColor = Color.FromArgb(45, 96, 51);
+
+            foreach (Button button in new[] { btnSave, btnCancel })
+            {
+                button.BackColor = Color.FromArgb(45, 96, 51);
+                button.ForeColor = Color.White;
+                button.Font = new Font("Gabriola", 14F);
+                button.FlatStyle = FlatStyle.Flat;
+                button.FlatAppearance.BorderSize = 0;
+            }
+
+            foreach (Label label in new[] { lblArticle, lblType, lblName, lblDescription, lblMinCost, lblWidth })
+            {
+                label.Font = new Font("Gabriola", 14F);
+                label.ForeColor = Color.FromArgb(45, 96, 51);
+            }
+
+            // Настройка полей ввода
+            if (!_isNewProduct)
+            {
+                txtArticle.Text = _product.Article;
+                txtArticle.ReadOnly = true;
+                txtName.Text = _product.Name;
+                txtDescription.Text = _product.Description;
+                numMinCost.Value = _product.MinPartnerCost;
+                numWidth.Value = _product.RollWidth;
+            }
+            else
+            {
+                txtArticle.Text = DateTime.Now.ToString("yyyyMMddHHmmss");
+            }
+
+            // Настройка перетаскивания формы
+            panelTop.MouseDown += (s, e) =>
+            {
+                if (e.Button == MouseButtons.Left)
+                {
+                    _isDragging = true;
+                    _dragCursorPoint = Cursor.Position;
+                    _dragFormPoint = this.Location;
+                }
+            };
+
+            panelTop.MouseMove += (s, e) =>
+            {
+                if (_isDragging)
+                {
+                    Point dif = Point.Subtract(Cursor.Position, new Size(_dragCursorPoint));
+                    this.Location = Point.Add(_dragFormPoint, new Size(dif));
+                }
+            };
+
+            panelTop.MouseUp += (s, e) => _isDragging = false;
+
+            ValidateInput(null, EventArgs.Empty);
+        }
+
+        private async void LoadProductTypes()
         {
             try
             {
-                cmbType.Items.Clear();
-                var types = await Product.GetProductTypesAsync();
-                foreach (var type in types)
+                Cursor = Cursors.WaitCursor;
+
+                var query = "SELECT * FROM ProductTypes";
+                var dt = await _db.ExecuteQueryAsync(query);
+
+                var types = new List<ProductType>();
+                foreach (DataRow row in dt.Rows)
                 {
-                    cmbType.Items.Add(type);
+                    types.Add(new ProductType
+                    {
+                        Id = Convert.ToInt32(row["Id"]),
+                        TypeName = row["TypeName"].ToString(),
+                        Coefficient = Convert.ToDecimal(row["Coefficient"])
+                    });
                 }
 
-                if (cmbType.Items.Count > 0)
+                cmbType.DataSource = types;
+                cmbType.DisplayMember = "TypeName";
+                cmbType.ValueMember = "Id";
+
+                if (!_isNewProduct)
                 {
-                    cmbType.SelectedIndex = 0;
+                    cmbType.SelectedValue = _product.ProductTypeId;
                 }
             }
             catch (Exception ex)
             {
                 MessageBox.Show($"Ошибка при загрузке типов продукции: {ex.Message}",
                     "Ошибка", MessageBoxButtons.OK, MessageBoxIcon.Error);
+                DialogResult = DialogResult.Cancel;
+                Close();
             }
-        }
-
-        private void SetupForm()
-        {
-            this.Text = isNewProduct ? "Добавление продукции" : "Редактирование продукции";
-            lblTitle.Text = this.Text;
-
-            if (!isNewProduct && existingProduct != null)
+            finally
             {
-                txtArticle.Text = existingProduct.Article;
-                txtArticle.ReadOnly = true;
-                foreach (ProductType type in cmbType.Items)
-                {
-                    if (type.TypeName == existingProduct.ProductType.TypeName)
-                    {
-                        cmbType.SelectedItem = type;
-                        break;
-                    }
-                }
-                txtName.Text = existingProduct.Name;
-                txtDescription.Text = existingProduct.Description;
-                numMinCost.Value = existingProduct.MinPartnerCost;
-                numWidth.Value = existingProduct.RollWidth;
+                Cursor = Cursors.Default;
             }
-            else
-            {
-                txtArticle.Text = GenerateArticle();
-                numMinCost.Value = 1000;
-                numWidth.Value = 1.06m;
-            }
-        }
-
-        private string GenerateArticle()
-        {
-            return DateTime.UtcNow.ToString("yyyyMMddHHmmss");
-        }
-
-        private void SetupEvents()
-        {
-            panelTop.MouseDown += (s, e) =>
-            {
-                if (e.Button == MouseButtons.Left)
-                {
-                    isDragging = true;
-                    lastCursor = Cursor.Position;
-                    lastForm = this.Location;
-                }
-            };
-
-            panelTop.MouseMove += (s, e) =>
-            {
-                if (isDragging)
-                {
-                    int xDiff = Cursor.Position.X - lastCursor.X;
-                    int yDiff = Cursor.Position.Y - lastCursor.Y;
-                    this.Location = new Point(lastForm.X + xDiff, lastForm.Y + yDiff);
-                }
-            };
-
-            panelTop.MouseUp += (s, e) => isDragging = false;
-
-            txtArticle.TextChanged += ValidateInput;
-            txtName.TextChanged += ValidateInput;
-            cmbType.SelectedIndexChanged += ValidateInput;
-            numMinCost.ValueChanged += ValidateInput;
-            numWidth.ValueChanged += ValidateInput;
-
-            var toolTip = new ToolTip { ShowAlways = true };
-            toolTip.SetToolTip(txtArticle, "Уникальный артикул продукции");
-            toolTip.SetToolTip(cmbType, "Тип продукции");
-            toolTip.SetToolTip(txtName, "Наименование продукции");
-            toolTip.SetToolTip(txtDescription, "Описание продукции (необязательно)");
-            toolTip.SetToolTip(numMinCost, "Минимальная стоимость (руб.)");
-            toolTip.SetToolTip(numWidth, "Ширина рулона (м)");
         }
 
         private void ValidateInput(object sender, EventArgs e)
@@ -187,20 +201,64 @@ namespace Our_decor.Forms
                 btnSave.Enabled = false;
                 Cursor = Cursors.WaitCursor;
 
-                var product = new Product
-                {
-                    Id = existingProduct?.Id ?? 0,
-                    Article = txtArticle.Text.Trim(),
-                    ProductType = (ProductType)cmbType.SelectedItem,
-                    Name = txtName.Text.Trim(),
-                    Description = txtDescription.Text.Trim(),
-                    MinPartnerCost = numMinCost.Value,
-                    RollWidth = numWidth.Value,
-                    WorkshopNumber = 1,
-                    WorkersCount = 1
-                };
+                var product = _isNewProduct ? new Product() : _product;
+                product.Article = txtArticle.Text.Trim();
+                product.ProductTypeId = ((ProductType)cmbType.SelectedItem).Id;
+                product.Name = txtName.Text.Trim();
+                product.Description = txtDescription.Text.Trim();
+                product.MinPartnerCost = numMinCost.Value;
+                product.RollWidth = numWidth.Value;
+                product.WorkshopNumber = 1; // По умолчанию
+                product.WorkersCount = 1;   // По умолчанию
 
-                await product.SaveAsync();
+                if (_isNewProduct)
+                {
+                    var query = @"INSERT INTO Products 
+                        (Article, ProductTypeId, Name, Description, MinPartnerCost, RollWidth, WorkshopNumber, WorkersCount)
+                        VALUES (@Article, @ProductTypeId, @Name, @Description, @MinPartnerCost, @RollWidth, @WorkshopNumber, @WorkersCount);
+                        SELECT SCOPE_IDENTITY();";
+
+                    var parameters = new[]
+                    {
+                        new SqlParameter("@Article", product.Article),
+                        new SqlParameter("@ProductTypeId", product.ProductTypeId),
+                        new SqlParameter("@Name", product.Name),
+                        new SqlParameter("@Description", (object)product.Description ?? DBNull.Value),
+                        new SqlParameter("@MinPartnerCost", product.MinPartnerCost),
+                        new SqlParameter("@RollWidth", product.RollWidth),
+                        new SqlParameter("@WorkshopNumber", product.WorkshopNumber),
+                        new SqlParameter("@WorkersCount", product.WorkersCount)
+                    };
+
+                    var result = await _db.ExecuteScalarAsync(query, parameters);
+                    product.Id = Convert.ToInt32(result);
+                }
+                else
+                {
+                    var query = @"UPDATE Products SET 
+                        ProductTypeId = @ProductTypeId,
+                        Name = @Name,
+                        Description = @Description,
+                        MinPartnerCost = @MinPartnerCost,
+                        RollWidth = @RollWidth,
+                        WorkshopNumber = @WorkshopNumber,
+                        WorkersCount = @WorkersCount
+                        WHERE Id = @Id";
+
+                    var parameters = new[]
+                    {
+                        new SqlParameter("@Id", product.Id),
+                        new SqlParameter("@ProductTypeId", product.ProductTypeId),
+                        new SqlParameter("@Name", product.Name),
+                        new SqlParameter("@Description", (object)product.Description ?? DBNull.Value),
+                        new SqlParameter("@MinPartnerCost", product.MinPartnerCost),
+                        new SqlParameter("@RollWidth", product.RollWidth),
+                        new SqlParameter("@WorkshopNumber", product.WorkshopNumber),
+                        new SqlParameter("@WorkersCount", product.WorkersCount)
+                    };
+
+                    await _db.ExecuteNonQueryAsync(query, parameters);
+                }
 
                 Result = product;
                 DialogResult = DialogResult.OK;
@@ -220,32 +278,18 @@ namespace Our_decor.Forms
 
         private void btnCancel_Click(object sender, EventArgs e)
         {
-            if (MessageBox.Show("Вы уверены, что хотите отменить изменения?",
-                "Подтверждение", MessageBoxButtons.YesNo, MessageBoxIcon.Question) == DialogResult.Yes)
-            {
-                DialogResult = DialogResult.Cancel;
-                Close();
-            }
+            DialogResult = DialogResult.Cancel;
+            Close();
         }
 
-        private void btnClose_Click(object sender, EventArgs e)
+        protected override bool ProcessDialogKey(Keys keyData)
         {
-            btnCancel_Click(sender, e);
-        }
-
-        protected override void OnKeyDown(KeyEventArgs e)
-        {
-            base.OnKeyDown(e);
-            if (e.KeyCode == Keys.Escape)
+            if (keyData == Keys.Escape)
             {
                 btnCancel_Click(this, EventArgs.Empty);
+                return true;
             }
-            else if (e.KeyCode == Keys.Enter && btnSave.Enabled)
-            {
-                btnSave_Click(this, EventArgs.Empty);
-            }
+            return base.ProcessDialogKey(keyData);
         }
-
-        public Product Result { get; private set; }
     }
 }

@@ -48,6 +48,7 @@
           <Property Name="ProductionTime" Type="int" />
           <Property Name="WorkshopNumber" Type="int" />
           <Property Name="WorkersCount" Type="int" />
+          <Property Name="CalculatedCost" Type="decimal" Precision="10" Scale="2" />
         </EntityType>
         <EntityType Name="ProductTypes">
           <Key>
@@ -107,7 +108,6 @@
             <PropertyRef Name="Name" />
             <PropertyRef Name="MinPartnerCost" />
             <PropertyRef Name="RollWidth" />
-            <PropertyRef Name="MaterialCost" />
           </Key>
           <Property Name="Id" Type="int" Nullable="false" />
           <Property Name="Article" Type="nvarchar" MaxLength="50" Nullable="false" />
@@ -116,7 +116,7 @@
           <Property Name="Description" Type="nvarchar" MaxLength="1000" />
           <Property Name="MinPartnerCost" Type="decimal" Precision="10" Scale="2" Nullable="false" />
           <Property Name="RollWidth" Type="decimal" Precision="10" Scale="2" Nullable="false" />
-          <Property Name="MaterialCost" Type="decimal" Precision="38" Scale="6" Nullable="false" />
+          <Property Name="MaterialCost" Type="decimal" Precision="10" Scale="2" />
           <Property Name="ProductionTime" Type="int" />
           <Property Name="WorkshopNumber" Type="int" />
           <Property Name="WorkersCount" Type="int" />
@@ -133,7 +133,7 @@
             </Dependent>
           </ReferentialConstraint>
         </Association>
-        <Association Name="FK__ProductMa__Mater__49C3F6B7">
+        <Association Name="FK__ProductMa__Mater__4AB81AF0">
           <End Role="Materials" Type="Self.Materials" Multiplicity="1" />
           <End Role="ProductMaterials" Type="Self.ProductMaterials" Multiplicity="*" />
           <ReferentialConstraint>
@@ -145,7 +145,7 @@
             </Dependent>
           </ReferentialConstraint>
         </Association>
-        <Association Name="FK__ProductMa__Produ__48CFD27E">
+        <Association Name="FK__ProductMa__Produ__49C3F6B7">
           <End Role="Products" Type="Self.Products" Multiplicity="1">
             <OnDelete Action="Cascade" />
           </End>
@@ -159,7 +159,7 @@
             </Dependent>
           </ReferentialConstraint>
         </Association>
-        <Association Name="FK__Products__Produc__45F365D3">
+        <Association Name="FK__Products__Produc__46E78A0C">
           <End Role="ProductTypes" Type="Self.ProductTypes" Multiplicity="1" />
           <End Role="Products" Type="Self.Products" Multiplicity="*" />
           <ReferentialConstraint>
@@ -249,15 +249,15 @@
             <End Role="MaterialTypes" EntitySet="MaterialTypes" />
             <End Role="Materials" EntitySet="Materials" />
           </AssociationSet>
-          <AssociationSet Name="FK__ProductMa__Mater__49C3F6B7" Association="Self.FK__ProductMa__Mater__49C3F6B7">
+          <AssociationSet Name="FK__ProductMa__Mater__4AB81AF0" Association="Self.FK__ProductMa__Mater__4AB81AF0">
             <End Role="Materials" EntitySet="Materials" />
             <End Role="ProductMaterials" EntitySet="ProductMaterials" />
           </AssociationSet>
-          <AssociationSet Name="FK__ProductMa__Produ__48CFD27E" Association="Self.FK__ProductMa__Produ__48CFD27E">
+          <AssociationSet Name="FK__ProductMa__Produ__49C3F6B7" Association="Self.FK__ProductMa__Produ__49C3F6B7">
             <End Role="Products" EntitySet="Products" />
             <End Role="ProductMaterials" EntitySet="ProductMaterials" />
           </AssociationSet>
-          <AssociationSet Name="FK__Products__Produc__45F365D3" Association="Self.FK__Products__Produc__45F365D3">
+          <AssociationSet Name="FK__Products__Produc__46E78A0C" Association="Self.FK__Products__Produc__46E78A0C">
             <End Role="ProductTypes" EntitySet="ProductTypes" />
             <End Role="Products" EntitySet="Products" />
           </AssociationSet>
@@ -279,7 +279,7 @@
           <Property Name="StockQuantity" Type="Decimal" Precision="10" Scale="2" Nullable="false" />
           <Property Name="MinQuantity" Type="Decimal" Precision="10" Scale="2" Nullable="false" />
           <NavigationProperty Name="MaterialType" Relationship="Self.FK__Materials__Mater__3F466844" FromRole="Materials" ToRole="MaterialTypes" />
-          <NavigationProperty Name="ProductMaterials" Relationship="Self.FK__ProductMa__Mater__49C3F6B7" FromRole="Materials" ToRole="ProductMaterials" />
+          <NavigationProperty Name="ProductMaterials" Relationship="Self.FK__ProductMa__Mater__4AB81AF0" FromRole="Materials" ToRole="ProductMaterials" />
         </EntityType>
         <EntityType Name="MaterialType">
           <Key>
@@ -298,8 +298,8 @@
           <Property Name="ProductId" Type="Int32" Nullable="false" />
           <Property Name="MaterialId" Type="Int32" Nullable="false" />
           <Property Name="Quantity" Type="Decimal" Precision="10" Scale="4" Nullable="false" />
-          <NavigationProperty Name="Material" Relationship="Self.FK__ProductMa__Mater__49C3F6B7" FromRole="ProductMaterials" ToRole="Materials" />
-          <NavigationProperty Name="Product" Relationship="Self.FK__ProductMa__Produ__48CFD27E" FromRole="ProductMaterials" ToRole="Products" />
+          <NavigationProperty Name="Material" Relationship="Self.FK__ProductMa__Mater__4AB81AF0" FromRole="ProductMaterials" ToRole="Materials" />
+          <NavigationProperty Name="Product" Relationship="Self.FK__ProductMa__Produ__49C3F6B7" FromRole="ProductMaterials" ToRole="Products" />
         </EntityType>
         <EntityType Name="Product">
           <Key>
@@ -315,8 +315,9 @@
           <Property Name="ProductionTime" Type="Int32" />
           <Property Name="WorkshopNumber" Type="Int32" />
           <Property Name="WorkersCount" Type="Int32" />
-          <NavigationProperty Name="ProductMaterials" Relationship="Self.FK__ProductMa__Produ__48CFD27E" FromRole="Products" ToRole="ProductMaterials" />
-          <NavigationProperty Name="ProductType" Relationship="Self.FK__Products__Produc__45F365D3" FromRole="Products" ToRole="ProductTypes" />
+          <Property Name="CalculatedCost" Type="Decimal" Precision="10" Scale="2" />
+          <NavigationProperty Name="ProductMaterials" Relationship="Self.FK__ProductMa__Produ__49C3F6B7" FromRole="Products" ToRole="ProductMaterials" />
+          <NavigationProperty Name="ProductType" Relationship="Self.FK__Products__Produc__46E78A0C" FromRole="Products" ToRole="ProductTypes" />
         </EntityType>
         <EntityType Name="ProductType">
           <Key>
@@ -325,7 +326,7 @@
           <Property Name="Id" Type="Int32" Nullable="false" annotation:StoreGeneratedPattern="Identity" />
           <Property Name="TypeName" Type="String" MaxLength="100" FixedLength="false" Unicode="true" Nullable="false" />
           <Property Name="Coefficient" Type="Decimal" Precision="10" Scale="4" Nullable="false" />
-          <NavigationProperty Name="Products" Relationship="Self.FK__Products__Produc__45F365D3" FromRole="ProductTypes" ToRole="Products" />
+          <NavigationProperty Name="Products" Relationship="Self.FK__Products__Produc__46E78A0C" FromRole="ProductTypes" ToRole="Products" />
         </EntityType>
         <EntityType Name="sysdiagram">
           <Key>
@@ -373,7 +374,6 @@
             <PropertyRef Name="Name" />
             <PropertyRef Name="MinPartnerCost" />
             <PropertyRef Name="RollWidth" />
-            <PropertyRef Name="MaterialCost" />
           </Key>
           <Property Name="Id" Type="Int32" Nullable="false" />
           <Property Name="Article" Type="String" MaxLength="50" FixedLength="false" Unicode="true" Nullable="false" />
@@ -382,7 +382,7 @@
           <Property Name="Description" Type="String" MaxLength="1000" FixedLength="false" Unicode="true" />
           <Property Name="MinPartnerCost" Type="Decimal" Precision="10" Scale="2" Nullable="false" />
           <Property Name="RollWidth" Type="Decimal" Precision="10" Scale="2" Nullable="false" />
-          <Property Name="MaterialCost" Type="Decimal" Precision="38" Scale="6" Nullable="false" />
+          <Property Name="MaterialCost" Type="Decimal" Precision="10" Scale="2" />
           <Property Name="ProductionTime" Type="Int32" />
           <Property Name="WorkshopNumber" Type="Int32" />
           <Property Name="WorkersCount" Type="Int32" />
@@ -399,7 +399,7 @@
             </Dependent>
           </ReferentialConstraint>
         </Association>
-        <Association Name="FK__ProductMa__Mater__49C3F6B7">
+        <Association Name="FK__ProductMa__Mater__4AB81AF0">
           <End Role="Materials" Type="Self.Material" Multiplicity="1" />
           <End Role="ProductMaterials" Type="Self.ProductMaterial" Multiplicity="*" />
           <ReferentialConstraint>
@@ -411,7 +411,7 @@
             </Dependent>
           </ReferentialConstraint>
         </Association>
-        <Association Name="FK__ProductMa__Produ__48CFD27E">
+        <Association Name="FK__ProductMa__Produ__49C3F6B7">
           <End Role="Products" Type="Self.Product" Multiplicity="1">
             <OnDelete Action="Cascade" />
           </End>
@@ -425,7 +425,7 @@
             </Dependent>
           </ReferentialConstraint>
         </Association>
-        <Association Name="FK__Products__Produc__45F365D3">
+        <Association Name="FK__Products__Produc__46E78A0C">
           <End Role="ProductTypes" Type="Self.ProductType" Multiplicity="1" />
           <End Role="Products" Type="Self.Product" Multiplicity="*" />
           <ReferentialConstraint>
@@ -451,15 +451,15 @@
             <End Role="MaterialTypes" EntitySet="MaterialTypes" />
             <End Role="Materials" EntitySet="Materials" />
           </AssociationSet>
-          <AssociationSet Name="FK__ProductMa__Mater__49C3F6B7" Association="Self.FK__ProductMa__Mater__49C3F6B7">
+          <AssociationSet Name="FK__ProductMa__Mater__4AB81AF0" Association="Self.FK__ProductMa__Mater__4AB81AF0">
             <End Role="Materials" EntitySet="Materials" />
             <End Role="ProductMaterials" EntitySet="ProductMaterials" />
           </AssociationSet>
-          <AssociationSet Name="FK__ProductMa__Produ__48CFD27E" Association="Self.FK__ProductMa__Produ__48CFD27E">
+          <AssociationSet Name="FK__ProductMa__Produ__49C3F6B7" Association="Self.FK__ProductMa__Produ__49C3F6B7">
             <End Role="Products" EntitySet="Products" />
             <End Role="ProductMaterials" EntitySet="ProductMaterials" />
           </AssociationSet>
-          <AssociationSet Name="FK__Products__Produc__45F365D3" Association="Self.FK__Products__Produc__45F365D3">
+          <AssociationSet Name="FK__Products__Produc__46E78A0C" Association="Self.FK__Products__Produc__46E78A0C">
             <End Role="ProductTypes" EntitySet="ProductTypes" />
             <End Role="Products" EntitySet="Products" />
           </AssociationSet>
@@ -556,6 +556,7 @@
                 <ScalarProperty Name="ProductionTime" ColumnName="ProductionTime" />
                 <ScalarProperty Name="WorkshopNumber" ColumnName="WorkshopNumber" />
                 <ScalarProperty Name="WorkersCount" ColumnName="WorkersCount" />
+                <ScalarProperty Name="CalculatedCost" ColumnName="CalculatedCost" />
               </MappingFragment>
             </EntityTypeMapping>
           </EntitySetMapping>

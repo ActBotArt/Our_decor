@@ -30,6 +30,7 @@ namespace Our_decor
         public Nullable<int> ProductionTime { get; set; }
         public Nullable<int> WorkshopNumber { get; set; }
         public Nullable<int> WorkersCount { get; set; }
+        public Nullable<decimal> CalculatedCost { get; set; }
     
         [System.Diagnostics.CodeAnalysis.SuppressMessage("Microsoft.Usage", "CA2227:CollectionPropertiesShouldBeReadOnly")]
         public virtual ICollection<ProductMaterial> ProductMaterials { get; set; }

@@ -51,6 +51,7 @@ CREATE TABLE Products (
     ProductionTime INT DEFAULT 0,
     WorkshopNumber INT DEFAULT 1,
     WorkersCount INT DEFAULT 1,
+    CalculatedCost DECIMAL(10,2) DEFAULT 0, -- Добавлена новая колонка
     FOREIGN KEY (ProductTypeId) REFERENCES ProductTypes(Id)
 );
 GO
@@ -127,6 +128,16 @@ INSERT INTO ProductMaterials (ProductId, MaterialId, Quantity) VALUES
 (4, 8, 1.00);
 GO
 
+-- Обновляем значения CalculatedCost для существующих продуктов
+UPDATE p
+SET p.CalculatedCost = ISNULL(
+    (SELECT SUM(m.Cost * pm.Quantity)
+     FROM ProductMaterials pm
+     JOIN Materials m ON pm.MaterialId = m.Id
+     WHERE pm.ProductId = p.Id), 0)
+FROM Products p;
+GO
+
 CREATE FUNCTION CalculateMaterialNeed
 (
     @ProductTypeId INT,
@@ -180,20 +191,12 @@ SELECT
     p.Description,
     p.MinPartnerCost,
     p.RollWidth,
-    ISNULL(mc.MaterialCost, 0) AS MaterialCost,
+    p.CalculatedCost AS MaterialCost, -- Изменено на использование новой колонки
     p.ProductionTime,
     p.WorkshopNumber,
     p.WorkersCount
 FROM Products p
-INNER JOIN ProductTypes pt ON p.ProductTypeId = pt.Id
-LEFT JOIN (
-    SELECT 
-        pm.ProductId,
-        SUM(pm.Quantity * m.Cost) AS MaterialCost
-    FROM ProductMaterials pm
-    INNER JOIN Materials m ON pm.MaterialId = m.Id
-    GROUP BY pm.ProductId
-) mc ON p.Id = mc.ProductId;
+INNER JOIN ProductTypes pt ON p.ProductTypeId = pt.Id;
 GO
 
 CREATE VIEW ProductMaterialsView 
@@ -210,4 +213,35 @@ SELECT
 FROM Products p
 INNER JOIN ProductMaterials pm ON p.Id = pm.ProductId
 INNER JOIN Materials m ON pm.MaterialId = m.Id;
+GO
+
+-- Создаем триггер для автоматического обновления CalculatedCost
+CREATE TRIGGER TR_ProductMaterials_UpdateCost
+ON ProductMaterials
+AFTER INSERT, UPDATE, DELETE
+AS
+BEGIN
+    SET NOCOUNT ON;
+
+    -- Создаем временную таблицу с затронутыми ProductId
+    CREATE TABLE #AffectedProducts (ProductId INT);
+    
+    -- Добавляем ProductId из добавленных и измененных записей
+    INSERT INTO #AffectedProducts (ProductId)
+    SELECT DISTINCT ProductId FROM inserted
+    UNION
+    SELECT DISTINCT ProductId FROM deleted;
+    
+    -- Обновляем CalculatedCost для затронутых продуктов
+    UPDATE p
+    SET CalculatedCost = ISNULL(
+        (SELECT SUM(m.Cost * pm.Quantity)
+         FROM ProductMaterials pm
+         JOIN Materials m ON pm.MaterialId = m.Id
+         WHERE pm.ProductId = p.Id), 0)
+    FROM Products p
+    INNER JOIN #AffectedProducts ap ON p.Id = ap.ProductId;
+    
+    DROP TABLE #AffectedProducts;
+END;
 GO
