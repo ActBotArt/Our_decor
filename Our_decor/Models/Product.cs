@@ -15,6 +15,17 @@ namespace Our_decor.Models
         public int WorkshopNumber { get; set; }
         public int WorkersCount { get; set; }
         public decimal CalculatedCost { get; set; }
+
+        // Связанный тип продукта (заполняется в LoadDataAsync)
         public ProductType ProductType { get; set; }
+
+        // Добавляем свойство-обёртку, чтобы привязываться к нему из DataGridView
+        public string TypeName
+        {
+            get
+            {
+                return ProductType?.TypeName ?? "Не указан";
+            }
+        }
     }
 }

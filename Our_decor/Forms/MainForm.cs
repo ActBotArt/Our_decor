@@ -1,14 +1,14 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Data;
+using System.Diagnostics;
 using System.Drawing;
-using System.Windows.Forms;
-using System.Threading.Tasks;
+using System.IO;
 using System.Linq;
+using System.Threading.Tasks;
+using System.Windows.Forms;
 using Our_decor.Models;
 using Our_decor.Services;
-using System.IO;
-using System.Diagnostics;
-using System.Data;
 
 namespace Our_decor.Forms
 {
@@ -27,8 +27,8 @@ namespace Our_decor.Forms
             _userRole = role;
             _db = DatabaseService.Instance;
 
-            dataGridView.CellFormatting += dataGridView_CellFormatting;
             dataGridView.RowsDefaultCellStyle.Font = new Font("Gabriola", 12F);
+            dataGridView.CellFormatting += dataGridView_CellFormatting;
 
             ConfigureForm();
             LoadImages();
@@ -40,10 +40,7 @@ namespace Our_decor.Forms
             try
             {
                 string iconPath = Path.Combine(Application.StartupPath, "..", "..", "Resources", "logo.ico");
-                if (File.Exists(iconPath))
-                {
-                    this.Icon = new Icon(iconPath);
-                }
+                if (File.Exists(iconPath)) this.Icon = new Icon(iconPath);
 
                 string logoPath = Path.Combine(Application.StartupPath, "..", "..", "Resources", "logo.png");
                 if (File.Exists(logoPath))
@@ -78,16 +75,16 @@ namespace Our_decor.Forms
 
         private void ConfigureButtons()
         {
-            foreach (Button button in new[] { btnAdd, btnEdit, btnDelete, btnExit, btnMaterials })
+            foreach (Button btn in new[] { btnAdd, btnEdit, btnDelete, btnExit, btnMaterials })
             {
-                button.BackColor = Color.FromArgb(45, 96, 51);
-                button.ForeColor = Color.White;
-                button.Font = new Font("Gabriola", 14F);
-                button.FlatStyle = FlatStyle.Flat;
-                button.FlatAppearance.BorderSize = 0;
-                button.Cursor = Cursors.Hand;
-                button.FlatAppearance.MouseOverBackColor = Color.FromArgb(60, 130, 70);
-                button.FlatAppearance.MouseDownBackColor = Color.FromArgb(35, 75, 40);
+                btn.BackColor = Color.FromArgb(45, 96, 51);
+                btn.ForeColor = Color.White;
+                btn.Font = new Font("Gabriola", 14F);
+                btn.FlatStyle = FlatStyle.Flat;
+                btn.FlatAppearance.BorderSize = 0;
+                btn.Cursor = Cursors.Hand;
+                btn.FlatAppearance.MouseOverBackColor = Color.FromArgb(60, 130, 70);
+                btn.FlatAppearance.MouseDownBackColor = Color.FromArgb(35, 75, 40);
             }
         }
 
@@ -104,6 +101,7 @@ namespace Our_decor.Forms
             txtSearch.Location = new Point(580, 15);
             txtSearch.BorderStyle = BorderStyle.FixedSingle;
             txtSearch.Anchor = AnchorStyles.Top | AnchorStyles.Left | AnchorStyles.Right;
+            txtSearch.TextChanged += txtSearch_TextChanged;
         }
 
         private void SetupDataGridView()
@@ -117,11 +115,10 @@ namespace Our_decor.Forms
             dataGridView.RowHeadersVisible = false;
             dataGridView.BackgroundColor = Color.White;
             dataGridView.BorderStyle = BorderStyle.None;
-            dataGridView.Font = new Font("Gabriola", 12F);
             dataGridView.GridColor = Color.FromArgb(187, 217, 178);
             dataGridView.CellBorderStyle = DataGridViewCellBorderStyle.SingleHorizontal;
 
-            // Настройка заголовков
+            // Заголовки
             dataGridView.ColumnHeadersDefaultCellStyle.BackColor = Color.FromArgb(45, 96, 51);
             dataGridView.ColumnHeadersDefaultCellStyle.ForeColor = Color.White;
             dataGridView.ColumnHeadersDefaultCellStyle.Font = new Font("Gabriola", 14F, FontStyle.Bold);
@@ -129,7 +126,7 @@ namespace Our_decor.Forms
             dataGridView.ColumnHeadersHeight = 40;
             dataGridView.EnableHeadersVisualStyles = false;
 
-            // Настройка строк
+            // Строки
             dataGridView.RowTemplate.Height = 35;
             dataGridView.AlternatingRowsDefaultCellStyle.BackColor = Color.FromArgb(242, 247, 240);
             dataGridView.DefaultCellStyle.SelectionBackColor = Color.FromArgb(187, 217, 178);
@@ -144,93 +141,104 @@ namespace Our_decor.Forms
                 Padding = new Padding(5)
             };
 
+            // Очищаем прежние колонки
             dataGridView.Columns.Clear();
-            dataGridView.Columns.AddRange(
-                new DataGridViewTextBoxColumn
+
+            // 1) Столбец «Артикул» (привязка к свойству Article)
+            dataGridView.Columns.Add(new DataGridViewTextBoxColumn
+            {
+                Name = "Article",
+                HeaderText = "Артикул",
+                DataPropertyName = "Article",
+                Width = 120,
+                DefaultCellStyle = new DataGridViewCellStyle(baseStyle)
                 {
-                    Name = "Article",
-                    HeaderText = "Артикул",
-                    DataPropertyName = "Article",
-                    Width = 120,
-                    DefaultCellStyle = new DataGridViewCellStyle(baseStyle)
-                    {
-                        Alignment = DataGridViewContentAlignment.MiddleCenter,
-                        BackColor = Color.FromArgb(209, 238, 197)
-                    }
-                },
-                new DataGridViewTextBoxColumn
-                {
-                    Name = "Type",
-                    HeaderText = "Тип продукта",
-                    DataPropertyName = "ProductType.TypeName",
-                    Width = 200,
-                    DefaultCellStyle = new DataGridViewCellStyle(baseStyle)
-                    {
-                        Alignment = DataGridViewContentAlignment.MiddleLeft,
-                        Padding = new Padding(10, 0, 0, 0)
-                    }
-                },
-                new DataGridViewTextBoxColumn
-                {
-                    Name = "Name",
-                    HeaderText = "Наименование",
-                    DataPropertyName = "Name",
-                    Width = 300,
-                    DefaultCellStyle = new DataGridViewCellStyle(baseStyle)
-                    {
-                        Alignment = DataGridViewContentAlignment.MiddleLeft,
-                        Padding = new Padding(10, 0, 0, 0)
-                    }
-                },
-                new DataGridViewTextBoxColumn
-                {
-                    Name = "CalculatedCost",
-                    HeaderText = "Расчетная стоимость",
-                    DataPropertyName = "CalculatedCost",
-                    Width = 150,
-                    DefaultCellStyle = new DataGridViewCellStyle(baseStyle)
-                    {
-                        Alignment = DataGridViewContentAlignment.MiddleRight,
-                        Format = "N2",
-                        Padding = new Padding(0, 0, 10, 0)
-                    }
-                },
-                new DataGridViewTextBoxColumn
-                {
-                    Name = "MinPartnerCost",
-                    HeaderText = "Мин. стоимость",
-                    DataPropertyName = "MinPartnerCost",
-                    Width = 150,
-                    DefaultCellStyle = new DataGridViewCellStyle(baseStyle)
-                    {
-                        Alignment = DataGridViewContentAlignment.MiddleRight,
-                        Format = "N2",
-                        Padding = new Padding(0, 0, 10, 0)
-                    }
-                },
-                new DataGridViewTextBoxColumn
-                {
-                    Name = "RollWidth",
-                    HeaderText = "Ширина рулона",
-                    DataPropertyName = "RollWidth",
-                    Width = 150,
-                    DefaultCellStyle = new DataGridViewCellStyle(baseStyle)
-                    {
-                        Alignment = DataGridViewContentAlignment.MiddleRight,
-                        Format = "N2",
-                        Padding = new Padding(0, 0, 10, 0)
-                    }
+                    Alignment = DataGridViewContentAlignment.MiddleCenter,
+                    BackColor = Color.FromArgb(209, 238, 197)
                 }
-            );
+            });
+
+            // 2) НЕПРИВЯЗАННЫЙ столбец «Тип продукта» — будем заполнять вручную
+            dataGridView.Columns.Add(new DataGridViewTextBoxColumn
+            {
+                Name = "TypeName",
+                HeaderText = "Тип продукта",
+                // НЕ указываем DataPropertyName, т.к. будем заполнять ячейки вручную
+                Width = 200,
+                DefaultCellStyle = new DataGridViewCellStyle(baseStyle)
+                {
+                    Alignment = DataGridViewContentAlignment.MiddleLeft,
+                    Padding = new Padding(10, 0, 0, 0)
+                }
+            });
+
+            // 3) Столбец «Наименование» (привязка к свойству Name)
+            dataGridView.Columns.Add(new DataGridViewTextBoxColumn
+            {
+                Name = "Name",
+                HeaderText = "Наименование",
+                DataPropertyName = "Name",
+                Width = 300,
+                DefaultCellStyle = new DataGridViewCellStyle(baseStyle)
+                {
+                    Alignment = DataGridViewContentAlignment.MiddleLeft,
+                    Padding = new Padding(10, 0, 0, 0)
+                }
+            });
+
+            // 4) «Расчетная стоимость»
+            dataGridView.Columns.Add(new DataGridViewTextBoxColumn
+            {
+                Name = "CalculatedCost",
+                HeaderText = "Расчетная стоимость",
+                DataPropertyName = "CalculatedCost",
+                Width = 150,
+                DefaultCellStyle = new DataGridViewCellStyle(baseStyle)
+                {
+                    Alignment = DataGridViewContentAlignment.MiddleRight,
+                    Format = "N2",
+                    Padding = new Padding(0, 0, 10, 0)
+                }
+            });
+
+            // 5) «Мин. стоимость»
+            dataGridView.Columns.Add(new DataGridViewTextBoxColumn
+            {
+                Name = "MinPartnerCost",
+                HeaderText = "Мин. стоимость",
+                DataPropertyName = "MinPartnerCost",
+                Width = 150,
+                DefaultCellStyle = new DataGridViewCellStyle(baseStyle)
+                {
+                    Alignment = DataGridViewContentAlignment.MiddleRight,
+                    Format = "N2",
+                    Padding = new Padding(0, 0, 10, 0)
+                }
+            });
+
+            // 6) «Ширина рулона»
+            dataGridView.Columns.Add(new DataGridViewTextBoxColumn
+            {
+                Name = "RollWidth",
+                HeaderText = "Ширина рулона",
+                DataPropertyName = "RollWidth",
+                Width = 150,
+                DefaultCellStyle = new DataGridViewCellStyle(baseStyle)
+                {
+                    Alignment = DataGridViewContentAlignment.MiddleRight,
+                    Format = "N2",
+                    Padding = new Padding(0, 0, 10, 0)
+                }
+            });
 
             dataGridView.AutoSizeColumnsMode = DataGridViewAutoSizeColumnsMode.Fill;
-            dataGridView.CellFormatting += dataGridView_CellFormatting;
         }
 
         private void dataGridView_CellFormatting(object sender, DataGridViewCellFormattingEventArgs e)
         {
             try
             {
+                // Форматируем только числовые столбцы «Мин. стоимость» и «Расчетная стоимость»
                 if ((e.ColumnIndex == dataGridView.Columns["MinPartnerCost"].Index ||
                      e.ColumnIndex == dataGridView.Columns["CalculatedCost"].Index) &&
                     e.Value != null)
@@ -262,36 +270,37 @@ namespace Our_decor.Forms
             {
                 Cursor = Cursors.WaitCursor;
 
+                // Запрос сразу возвращает TypeName и остальные поля
                 var query = @"
-            SELECT 
-                p.Id,
-                p.Article,
-                p.ProductTypeId,
-                p.Name,
-                p.Description,
-                p.MinPartnerCost,
-                p.RollWidth,
-                p.ProductionTime,
-                p.WorkshopNumber,
-                p.WorkersCount,
-                ISNULL(pt.TypeName, 'Не указан') as TypeName,
-                ISNULL(pt.Coefficient, 0) as Coefficient,
-                ISNULL((
-                    SELECT SUM(m.Cost * pm.Quantity)
-                    FROM ProductMaterials pm
-                    JOIN Materials m ON pm.MaterialId = m.Id
-                    WHERE pm.ProductId = p.Id
-                ), 0) as CalculatedCost
-            FROM Products p 
-            LEFT JOIN ProductTypes pt ON p.ProductTypeId = pt.Id
-            ORDER BY p.Article";
+                    SELECT 
+                        p.Id,
+                        p.Article,
+                        p.ProductTypeId,
+                        p.Name,
+                        p.Description,
+                        p.MinPartnerCost,
+                        p.RollWidth,
+                        p.ProductionTime,
+                        p.WorkshopNumber,
+                        p.WorkersCount,
+                        ISNULL(pt.TypeName, 'Не указан') as TypeName,
+                        ISNULL(pt.Coefficient, 0) as Coefficient,
+                        ISNULL((
+                            SELECT SUM(m.Cost * pm.Quantity)
+                            FROM ProductMaterials pm
+                            JOIN Materials m ON pm.MaterialId = m.Id
+                            WHERE pm.ProductId = p.Id
+                        ), 0) as CalculatedCost
+                    FROM Products p 
+                    LEFT JOIN ProductTypes pt ON p.ProductTypeId = pt.Id
+                    ORDER BY p.Article";
 
-                var dataTable = await _db.ExecuteQueryAsync(query);
+                DataTable dt = await _db.ExecuteQueryAsync(query);
                 _products = new List<Product>();
 
-                foreach (DataRow row in dataTable.Rows)
+                foreach (DataRow row in dt.Rows)
                 {
-                    var product = new Product
+                    var prod = new Product
                     {
                         Id = Convert.ToInt32(row["Id"]),
                         Article = row["Article"].ToString(),
@@ -304,6 +313,7 @@ namespace Our_decor.Forms
                         WorkshopNumber = Convert.ToInt32(row["WorkshopNumber"]),
                         WorkersCount = Convert.ToInt32(row["WorkersCount"]),
                         CalculatedCost = Convert.ToDecimal(row["CalculatedCost"]),
+                        // Сохраняем только TypeName и Coefficient в ProductType, чтобы потом вывести TypeName
                         ProductType = new ProductType
                         {
                             Id = Convert.ToInt32(row["ProductTypeId"]),
@@ -311,19 +321,30 @@ namespace Our_decor.Forms
                             Coefficient = Convert.ToDecimal(row["Coefficient"])
                         }
                     };
-
-                    _products.Add(product);
+                    _products.Add(prod);
                 }
 
+                // Привязываем список к DataGridView
                 dataGridView.DataSource = null;
                 dataGridView.DataSource = _products;
+
+                // ПОСЛЕ того, как DataSource установлен, заполняем вручную ячейку "TypeName"
+                for (int i = 0; i < _products.Count; i++)
+                {
+                    var typeName = _products[i].ProductType.TypeName;
+                    dataGridView.Rows[i].Cells["TypeName"].Value = typeName;
+                }
+
                 UpdateTotalLabel();
             }
             catch (Exception ex)
             {
                 Debug.WriteLine($"Ошибка загрузки данных: {ex.Message}");
-                MessageBox.Show("Произошла ошибка при загрузке данных.\nПроверьте подключение к базе данных.",
-                    "Ошибка", MessageBoxButtons.OK, MessageBoxIcon.Error);
+                MessageBox.Show(
+                    "Произошла ошибка при загрузке данных.\nПроверьте подключение к базе данных.",
+                    "Ошибка",
+                    MessageBoxButtons.OK,
+                    MessageBoxIcon.Error);
             }
             finally
             {
@@ -344,8 +365,9 @@ namespace Our_decor.Forms
             try
             {
                 var searchText = txtSearch.Text.ToLower().Trim();
-                var filtered = string.IsNullOrEmpty(searchText) ? _products :
-                    _products.Where(p =>
+                var filtered = string.IsNullOrEmpty(searchText)
+                    ? _products
+                    : _products.Where(p =>
                         p.Article.ToLower().Contains(searchText) ||
                         p.Name.ToLower().Contains(searchText) ||
                         p.ProductType.TypeName.ToLower().Contains(searchText))
@@ -353,6 +375,13 @@ namespace Our_decor.Forms
 
                 dataGridView.DataSource = null;
                 dataGridView.DataSource = filtered;
+
+                // Снова заполняем вручную столбец TypeName в отфильтрованных данных
+                for (int i = 0; i < filtered.Count; i++)
+                {
+                    dataGridView.Rows[i].Cells["TypeName"].Value = filtered[i].ProductType.TypeName;
+                }
+
                 UpdateTotalLabel();
             }
             catch (Exception ex)
@@ -375,8 +404,8 @@ namespace Our_decor.Forms
         {
             if (_isDragging)
             {
-                Point dif = Point.Subtract(Cursor.Position, new Size(_dragCursorPoint));
-                this.Location = Point.Add(_dragFormPoint, new Size(dif));
+                Point diff = Point.Subtract(Cursor.Position, new Size(_dragCursorPoint));
+                this.Location = Point.Add(_dragFormPoint, new Size(diff));
             }
         }
 
@@ -389,8 +418,11 @@ namespace Our_decor.Forms
         {
             if (_userRole == "User")
             {
-                MessageBox.Show("У вас нет прав для добавления продукции",
-                    "Доступ запрещен", MessageBoxButtons.OK, MessageBoxIcon.Warning);
+                MessageBox.Show(
+                    "У вас нет прав для добавления продукции",
+                    "Доступ запрещен",
+                    MessageBoxButtons.OK,
+                    MessageBoxIcon.Warning);
                 return;
             }
 
@@ -408,15 +440,21 @@ namespace Our_decor.Forms
         {
             if (_userRole == "User")
             {
-                MessageBox.Show("У вас нет прав для редактирования продукции",
-                    "Доступ запрещен", MessageBoxButtons.OK, MessageBoxIcon.Warning);
+                MessageBox.Show(
+                    "У вас нет прав для редактирования продукции",
+                    "Доступ запрещен",
+                    MessageBoxButtons.OK,
+                    MessageBoxIcon.Warning);
                 return;
             }
 
             if (dataGridView.SelectedRows.Count == 0)
             {
-                MessageBox.Show("Выберите продукцию для редактирования",
-                    "Внимание", MessageBoxButtons.OK, MessageBoxIcon.Warning);
+                MessageBox.Show(
+                    "Выберите продукцию для редактирования",
+                    "Внимание",
+                    MessageBoxButtons.OK,
+                    MessageBoxIcon.Warning);
                 return;
             }
 
@@ -435,43 +473,52 @@ namespace Our_decor.Forms
         {
             if (_userRole != "Admin")
             {
-                MessageBox.Show("У вас нет прав для удаления продукции",
-                    "Доступ запрещен", MessageBoxButtons.OK, MessageBoxIcon.Warning);
+                MessageBox.Show(
+                    "У вас нет прав для удаления продукции",
+                    "Доступ запрещен",
+                    MessageBoxButtons.OK,
+                    MessageBoxIcon.Warning);
                 return;
             }
 
             if (dataGridView.SelectedRows.Count == 0)
             {
-                MessageBox.Show("Выберите продукцию для удаления",
-                    "Внимание", MessageBoxButtons.OK, MessageBoxIcon.Warning);
+                MessageBox.Show(
+                    "Выберите продукцию для удаления",
+                    "Внимание",
+                    MessageBoxButtons.OK,
+                    MessageBoxIcon.Warning);
                 return;
             }
 
             var product = (Product)dataGridView.SelectedRows[0].DataBoundItem;
-
             if (MessageBox.Show(
-                $"Вы действительно хотите удалить продукцию?\n\nАртикул: {product.Article}\nНаименование: {product.Name}",
-                "Подтверждение удаления",
-                MessageBoxButtons.YesNo,
-                MessageBoxIcon.Question) == DialogResult.Yes)
+                    $"Вы действительно хотите удалить продукцию?\n\nАртикул: {product.Article}\nНаименование: {product.Name}",
+                    "Подтверждение удаления",
+                    MessageBoxButtons.YesNo,
+                    MessageBoxIcon.Question) == DialogResult.Yes)
             {
                 try
                 {
                     Cursor = Cursors.WaitCursor;
-
                     var query = "DELETE FROM Products WHERE Id = @Id";
                     var parameter = new System.Data.SqlClient.SqlParameter("@Id", product.Id);
                     await _db.ExecuteNonQueryAsync(query, parameter);
-
                     await LoadDataAsync();
-                    MessageBox.Show("Продукция успешно удалена",
-                        "Информация", MessageBoxButtons.OK, MessageBoxIcon.Information);
+                    MessageBox.Show(
+                        "Продукция успешно удалена",
+                        "Информация",
+                        MessageBoxButtons.OK,
+                        MessageBoxIcon.Information);
                 }
                 catch (Exception ex)
                 {
                     Debug.WriteLine($"Ошибка удаления: {ex.Message}");
-                    MessageBox.Show($"Ошибка удаления: {ex.Message}",
-                        "Ошибка", MessageBoxButtons.OK, MessageBoxIcon.Error);
+                    MessageBox.Show(
+                        $"Ошибка удаления: {ex.Message}",
+                        "Ошибка",
+                        MessageBoxButtons.OK,
+                        MessageBoxIcon.Error);
                 }
                 finally
                 {
@@ -484,13 +531,16 @@ namespace Our_decor.Forms
         {
             if (dataGridView.SelectedRows.Count == 0)
             {
-                MessageBox.Show("Выберите продукцию для просмотра материалов",
-                    "Внимание", MessageBoxButtons.OK, MessageBoxIcon.Warning);
+                MessageBox.Show(
+                    "Выберите продукцию для просмотра материалов",
+                    "Внимание",
+                    MessageBoxButtons.OK,
+                    MessageBoxIcon.Warning);
                 return;
             }
 
             var product = (Product)dataGridView.SelectedRows[0].DataBoundItem;
-            using (var form = new MaterialsForm(product, _userRole)) // Передаем роль пользователя
+            using (var form = new MaterialsForm(product, _userRole))
             {
                 form.StartPosition = FormStartPosition.CenterParent;
                 form.ShowDialog();
@@ -504,8 +554,11 @@ namespace Our_decor.Forms
 
         private void MainForm_FormClosing(object sender, FormClosingEventArgs e)
         {
-            if (MessageBox.Show("Вы действительно хотите выйти?",
-                "Подтверждение", MessageBoxButtons.YesNo, MessageBoxIcon.Question) == DialogResult.No)
+            if (MessageBox.Show(
+                    "Вы действительно хотите выйти?",
+                    "Подтверждение",
+                    MessageBoxButtons.YesNo,
+                    MessageBoxIcon.Question) == DialogResult.No)
             {
                 e.Cancel = true;
             }
