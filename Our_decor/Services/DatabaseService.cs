@@ -1,8 +1,10 @@
 ﻿using System;
 using System.Data;
+using System.Data.Entity.Core.EntityClient;
 using System.Data.SqlClient;
 using System.Threading.Tasks;
 using System.Diagnostics;
+using System.Configuration;
 
 namespace Our_decor.Services
 {
@@ -13,7 +15,16 @@ namespace Our_decor.Services
 
         private DatabaseService()
         {
-            connectionString = @"Data Source=LAPTOP-G0UUB676\SQLEXPRESS01;Initial Catalog=decorDB;Integrated Security=True;MultipleActiveResultSets=True;TrustServerCertificate=True";
+            // Читаем EF-строку из app.config
+            var efConnection = ConfigurationManager.ConnectionStrings["decorDBEntities"];
+            if (efConnection == null)
+            {
+                throw new ConfigurationErrorsException("Строка подключения 'decorDBEntities' не найдена в конфигурации");
+            }
+
+            // Через EntityConnectionStringBuilder берём внутреннюю строку SQL
+            var efBuilder = new EntityConnectionStringBuilder(efConnection.ConnectionString);
+            connectionString = efBuilder.ProviderConnectionString;
         }
 
         public static DatabaseService Instance
