@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Data;
 using System.Data.SqlClient;
 using System.Drawing;
+using System.Text.RegularExpressions;
 using System.Windows.Forms;
 using Our_decor.Models;
 using Our_decor.Services;
@@ -68,6 +69,9 @@ namespace Our_decor.Forms
             else
             {
                 txtArticle.Text = DateTime.Now.ToString("yyyyMMddHHmmss");
+                // Устанавливаем минимальную цену по умолчанию
+                numMinCost.Value = 0.01M;
+                numWidth.Value = 0.01M;
             }
 
             // Настройка перетаскивания формы
@@ -137,10 +141,82 @@ namespace Our_decor.Forms
             }
         }
 
+        // Проверка символов в названии - только буквы и цифры
+        private void txtName_KeyPress(object sender, KeyPressEventArgs e)
+        {
+            // Разрешаем управляющие символы (Backspace, Delete и т.д.)
+            if (char.IsControl(e.KeyChar))
+            {
+                return;
+            }
+
+            // Разрешаем только буквы (русские и английские), цифры и пробел
+            if (!char.IsLetterOrDigit(e.KeyChar) && e.KeyChar != ' ')
+            {
+                e.Handled = true; // Блокируем ввод недопустимого символа
+
+                // Показываем предупреждение
+                ShowNameError("Разрешены только буквы, цифры и пробелы!");
+
+                // Автоматически скрываем сообщение через 3 секунды
+                var timer = new Timer();
+                timer.Interval = 3000;
+                timer.Tick += (s, args) =>
+                {
+                    HideNameError();
+                    timer.Stop();
+                    timer.Dispose();
+                };
+                timer.Start();
+            }
+        }
+
+        // Проверка названия на корректность
+        private bool IsValidName(string name)
+        {
+            if (string.IsNullOrWhiteSpace(name))
+                return false;
+
+            // Проверяем, что в строке только буквы, цифры и пробелы
+            Regex regex = new Regex(@"^[а-яёА-ЯЁa-zA-Z0-9\s]+$");
+            return regex.IsMatch(name.Trim());
+        }
+
+        // Показать ошибку названия
+        private void ShowNameError(string message)
+        {
+            lblNameError.Text = message;
+            lblNameError.Visible = true;
+            txtName.BackColor = Color.MistyRose;
+        }
+
+        // Скрыть ошибку названия
+        private void HideNameError()
+        {
+            lblNameError.Visible = false;
+            lblNameError.Text = "";
+        }
+
+        // Показать ошибку цены
+        private void ShowPriceError(string message)
+        {
+            lblPriceError.Text = message;
+            lblPriceError.Visible = true;
+            numMinCost.BackColor = Color.MistyRose;
+        }
+
+        // Скрыть ошибку цены
+        private void HidePriceError()
+        {
+            lblPriceError.Visible = false;
+            lblPriceError.Text = "";
+        }
+
         private void ValidateInput(object sender, EventArgs e)
         {
             bool isValid = true;
 
+            // Проверка артикула
             if (string.IsNullOrWhiteSpace(txtArticle.Text))
             {
                 isValid = false;
@@ -151,16 +227,26 @@ namespace Our_decor.Forms
                 txtArticle.BackColor = SystemColors.Window;
             }
 
-            if (string.IsNullOrWhiteSpace(txtName.Text))
+            // Проверка названия
+            if (!IsValidName(txtName.Text))
             {
                 isValid = false;
-                txtName.BackColor = Color.MistyRose;
+                if (string.IsNullOrWhiteSpace(txtName.Text))
+                {
+                    ShowNameError("Название не может быть пустым!");
+                }
+                else
+                {
+                    ShowNameError("Недопустимые символы в названии!");
+                }
             }
             else
             {
                 txtName.BackColor = SystemColors.Window;
+                HideNameError();
             }
 
+            // Проверка типа продукта
             if (cmbType.SelectedItem == null)
             {
                 isValid = false;
@@ -171,16 +257,24 @@ namespace Our_decor.Forms
                 cmbType.BackColor = SystemColors.Window;
             }
 
+            // Проверка минимальной стоимости - ОБЯЗАТЕЛЬНО ДОЛЖНА БЫТЬ ЦЕНА!
             if (numMinCost.Value <= 0)
             {
                 isValid = false;
-                numMinCost.BackColor = Color.MistyRose;
+                ShowPriceError("Цена обязательна!");
+            }
+            else if (numMinCost.Value < 0.01M)
+            {
+                isValid = false;
+                ShowPriceError("Минимальная цена 0.01!");
             }
             else
             {
                 numMinCost.BackColor = SystemColors.Window;
+                HidePriceError();
             }
 
+            // Проверка ширины рулона
             if (numWidth.Value <= 0 || numWidth.Value > 10)
             {
                 isValid = false;
@@ -196,6 +290,23 @@ namespace Our_decor.Forms
 
         private async void btnSave_Click(object sender, EventArgs e)
         {
+            // Дополнительная проверка перед сохранением
+            if (!IsValidName(txtName.Text))
+            {
+                MessageBox.Show("Название продукта содержит недопустимые символы!\nРазрешены только буквы, цифры и пробелы.",
+                    "Ошибка валидации", MessageBoxButtons.OK, MessageBoxIcon.Warning);
+                txtName.Focus();
+                return;
+            }
+
+            if (numMinCost.Value <= 0)
+            {
+                MessageBox.Show("Цена продукта обязательна и должна быть больше нуля!",
+                    "Ошибка валидации", MessageBoxButtons.OK, MessageBoxIcon.Warning);
+                numMinCost.Focus();
+                return;
+            }
+
             try
             {
                 btnSave.Enabled = false;
@@ -260,6 +371,9 @@ namespace Our_decor.Forms
                     await _db.ExecuteNonQueryAsync(query, parameters);
                 }
 
+                MessageBox.Show("Продукт успешно сохранен!", "Успех",
+                    MessageBoxButtons.OK, MessageBoxIcon.Information);
+
                 Result = product;
                 DialogResult = DialogResult.OK;
                 Close();
@@ -287,6 +401,11 @@ namespace Our_decor.Forms
             if (keyData == Keys.Escape)
             {
                 btnCancel_Click(this, EventArgs.Empty);
+                return true;
+            }
+            else if (keyData == Keys.Enter && btnSave.Enabled)
+            {
+                btnSave_Click(this, EventArgs.Empty);
                 return true;
             }
             return base.ProcessDialogKey(keyData);

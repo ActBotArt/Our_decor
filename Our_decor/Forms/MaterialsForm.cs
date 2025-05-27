@@ -1,13 +1,13 @@
-﻿using System;
+﻿// MaterialsForm.cs
+using System;
 using System.Data;
-using System.Drawing;
-using System.Windows.Forms;
 using System.Data.SqlClient;
-using System.Threading.Tasks;
-using Our_decor.Models;
-using System.Diagnostics;
-using Our_decor.Services;
+using System.Drawing;
 using System.IO;
+using System.Windows.Forms;
+using System.Diagnostics;
+using Our_decor.Models;
+using Our_decor.Services;
 
 namespace Our_decor.Forms
 {
@@ -55,8 +55,10 @@ namespace Our_decor.Forms
 
         private void InitializeTimer()
         {
-            _timer = new Timer();
-            _timer.Interval = 1000;
+            _timer = new Timer
+            {
+                Interval = 1000
+            };
             _timer.Tick += Timer_Tick;
             _timer.Start();
             UpdateDateTime();
@@ -117,6 +119,7 @@ namespace Our_decor.Forms
             lblUser.ForeColor = Color.FromArgb(45, 96, 51);
 
             btnAdd.Visible = _userRole.Equals("Admin", StringComparison.OrdinalIgnoreCase);
+            btnDelete.Visible = _userRole.Equals("Admin", StringComparison.OrdinalIgnoreCase);
             dataGridView.ReadOnly = !_userRole.Equals("Admin", StringComparison.OrdinalIgnoreCase);
         }
 
@@ -129,6 +132,7 @@ namespace Our_decor.Forms
             dataGridView.MultiSelect = false;
             dataGridView.AllowUserToAddRows = false;
             dataGridView.AllowUserToDeleteRows = false;
+            dataGridView.AllowUserToResizeRows = false;
             dataGridView.RowHeadersVisible = false;
             dataGridView.BackgroundColor = Color.White;
             dataGridView.BorderStyle = BorderStyle.None;
@@ -149,6 +153,12 @@ namespace Our_decor.Forms
             dataGridView.DefaultCellStyle.SelectionBackColor = Color.FromArgb(187, 217, 178);
             dataGridView.DefaultCellStyle.SelectionForeColor = Color.FromArgb(45, 96, 51);
 
+            // Добавляем защиту от редактирования
+            dataGridView.CellBeginEdit += DataGridView_CellBeginEdit;
+            dataGridView.CellValidating += DataGridView_CellValidating;
+            dataGridView.CellParsing += DataGridView_CellParsing;
+            dataGridView.DataError += DataGridView_DataError;
+
             var baseStyle = new DataGridViewCellStyle
             {
                 Font = new Font("Gabriola", 12F),
@@ -160,6 +170,24 @@ namespace Our_decor.Forms
 
             dataGridView.Columns.Clear();
             dataGridView.Columns.AddRange(
+                // Скрытая колонка для MaterialId
+                new DataGridViewTextBoxColumn
+                {
+                    Name = "MaterialId",
+                    HeaderText = "ID",
+                    DataPropertyName = "MaterialId",
+                    Visible = false,
+                    ReadOnly = true
+                },
+                // Скрытая колонка для MaterialTypeId
+                new DataGridViewTextBoxColumn
+                {
+                    Name = "MaterialTypeId",
+                    HeaderText = "TypeID",
+                    DataPropertyName = "MaterialTypeId",
+                    Visible = false,
+                    ReadOnly = true
+                },
                 new DataGridViewTextBoxColumn
                 {
                     Name = "TypeName",
@@ -178,6 +206,7 @@ namespace Our_decor.Forms
                     Name = "MaterialName",
                     HeaderText = "Наименование",
                     DataPropertyName = "MaterialName",
+                    ReadOnly = true,
                     FillWeight = 30,
                     DefaultCellStyle = new DataGridViewCellStyle(baseStyle)
                     {
@@ -189,6 +218,7 @@ namespace Our_decor.Forms
                     Name = "Cost",
                     HeaderText = "Цена",
                     DataPropertyName = "Cost",
+                    ReadOnly = true,
                     FillWeight = 10,
                     DefaultCellStyle = new DataGridViewCellStyle(baseStyle)
                     {
@@ -213,6 +243,7 @@ namespace Our_decor.Forms
                     Name = "Unit",
                     HeaderText = "Ед. изм.",
                     DataPropertyName = "Unit",
+                    ReadOnly = true,
                     FillWeight = 10,
                     DefaultCellStyle = new DataGridViewCellStyle(baseStyle)
                     {
@@ -224,6 +255,7 @@ namespace Our_decor.Forms
                     Name = "StockQuantity",
                     HeaderText = "На складе",
                     DataPropertyName = "StockQuantity",
+                    ReadOnly = true,
                     FillWeight = 10,
                     DefaultCellStyle = new DataGridViewCellStyle(baseStyle)
                     {
@@ -236,6 +268,7 @@ namespace Our_decor.Forms
                     Name = "MinQuantity",
                     HeaderText = "Мин. кол-во",
                     DataPropertyName = "MinQuantity",
+                    ReadOnly = true,
                     FillWeight = 10,
                     DefaultCellStyle = new DataGridViewCellStyle(baseStyle)
                     {
@@ -244,6 +277,65 @@ namespace Our_decor.Forms
                     }
                 }
             );
+        }
+
+        // Защита от редактирования для обычных пользователей
+        private void DataGridView_CellBeginEdit(object sender, DataGridViewCellCancelEventArgs e)
+        {
+            if (!_userRole.Equals("Admin", StringComparison.OrdinalIgnoreCase))
+            {
+                e.Cancel = true;
+                return;
+            }
+
+            // Разрешаем редактировать только количество
+            string columnName = dataGridView.Columns[e.ColumnIndex].Name;
+            if (columnName != "Quantity")
+            {
+                e.Cancel = true;
+            }
+        }
+
+        // Валидация ввода данных
+        private void DataGridView_CellValidating(object sender, DataGridViewCellValidatingEventArgs e)
+        {
+            if (!_userRole.Equals("Admin", StringComparison.OrdinalIgnoreCase))
+                return;
+
+            string columnName = dataGridView.Columns[e.ColumnIndex].Name;
+
+            if (columnName == "Quantity")
+            {
+                if (!decimal.TryParse(e.FormattedValue?.ToString(), out decimal value) || value < 0)
+                {
+                    e.Cancel = true;
+                    MessageBox.Show("Введите корректное положительное число для количества!",
+                        "Ошибка ввода", MessageBoxButtons.OK, MessageBoxIcon.Warning);
+                }
+            }
+        }
+
+        // Парсинг данных
+        private void DataGridView_CellParsing(object sender, DataGridViewCellParsingEventArgs e)
+        {
+            string columnName = dataGridView.Columns[e.ColumnIndex].Name;
+
+            if (columnName == "Quantity")
+            {
+                if (decimal.TryParse(e.Value?.ToString(), out decimal value))
+                {
+                    e.Value = Math.Round(value, 2);
+                    e.ParsingApplied = true;
+                }
+            }
+        }
+
+        // Обработка ошибок данных
+        private void DataGridView_DataError(object sender, DataGridViewDataErrorEventArgs e)
+        {
+            MessageBox.Show($"Ошибка в данных: {e.Exception.Message}",
+                "Ошибка данных", MessageBoxButtons.OK, MessageBoxIcon.Error);
+            e.Cancel = true;
         }
 
         private async void LoadMaterials()
@@ -274,18 +366,13 @@ namespace Our_decor.Forms
 
                 if (dataTable == null || dataTable.Rows.Count == 0)
                 {
-                    MessageBox.Show("Материалы не найдены",
-                        "Информация", MessageBoxButtons.OK, MessageBoxIcon.Information);
+                    dataGridView.DataSource = null;
+                    lblTotal.Text = "Всего материалов: 0";
                     return;
                 }
 
-                if (!dataGridView.IsHandleCreated || dataGridView.IsDisposed) return;
-
-                dataGridView.Invoke((MethodInvoker)delegate
-                {
-                    dataGridView.DataSource = dataTable;
-                    lblTotal.Text = $"Всего материалов: {dataTable.Rows.Count}";
-                });
+                dataGridView.DataSource = dataTable;
+                lblTotal.Text = $"Всего материалов: {dataTable.Rows.Count}";
             }
             catch (Exception ex)
             {
@@ -294,13 +381,7 @@ namespace Our_decor.Forms
             }
             finally
             {
-                if (!IsDisposed)
-                {
-                    Invoke((MethodInvoker)delegate
-                    {
-                        Cursor = Cursors.Default;
-                    });
-                }
+                Cursor = Cursors.Default;
             }
         }
 
@@ -342,12 +423,146 @@ namespace Our_decor.Forms
                 return;
             }
 
-            using (var form = new MaterialEditForm(_product.Id))
+            try
             {
-                if (form.ShowDialog() == DialogResult.OK)
+                using (var form = new MaterialEditForm(_product.Id))
                 {
-                    LoadMaterials();
+                    if (form.ShowDialog() == DialogResult.OK)
+                    {
+                        LoadMaterials();
+                    }
                 }
+            }
+            catch (Exception ex)
+            {
+                MessageBox.Show($"Ошибка при открытии формы добавления: {ex.Message}",
+                    "Ошибка", MessageBoxButtons.OK, MessageBoxIcon.Error);
+            }
+        }
+
+        private async void btnDelete_Click(object sender, EventArgs e)
+        {
+            if (!_userRole.Equals("Admin", StringComparison.OrdinalIgnoreCase))
+            {
+                MessageBox.Show("У вас нет прав для удаления материалов",
+                    "Доступ запрещен", MessageBoxButtons.OK, MessageBoxIcon.Warning);
+                return;
+            }
+
+            if (dataGridView.SelectedRows.Count == 0)
+            {
+                MessageBox.Show("Выберите материал для удаления",
+                    "Внимание", MessageBoxButtons.OK, MessageBoxIcon.Warning);
+                return;
+            }
+
+            try
+            {
+                var row = dataGridView.SelectedRows[0];
+
+                // Проверяем существование колонки MaterialId
+                if (!dataGridView.Columns.Contains("MaterialId"))
+                {
+                    MessageBox.Show("Ошибка структуры данных: отсутствует колонка MaterialId",
+                        "Ошибка", MessageBoxButtons.OK, MessageBoxIcon.Error);
+                    return;
+                }
+
+                // Проверяем значение в ячейке
+                if (row.Cells["MaterialId"].Value == null || row.Cells["MaterialId"].Value == DBNull.Value)
+                {
+                    MessageBox.Show("Не удается определить ID материала для удаления",
+                        "Ошибка", MessageBoxButtons.OK, MessageBoxIcon.Error);
+                    return;
+                }
+
+                if (!int.TryParse(row.Cells["MaterialId"].Value.ToString(), out int materialId) || materialId <= 0)
+                {
+                    MessageBox.Show("Некорректный ID материала",
+                        "Ошибка", MessageBoxButtons.OK, MessageBoxIcon.Error);
+                    return;
+                }
+
+                string materialName = row.Cells["MaterialName"].Value?.ToString() ?? "неизвестный материал";
+
+                if (MessageBox.Show(
+                    $"Вы действительно хотите удалить материал '{materialName}'?\n\nВнимание: это действие нельзя отменить!",
+                    "Подтверждение удаления",
+                    MessageBoxButtons.YesNo,
+                    MessageBoxIcon.Question) == DialogResult.Yes)
+                {
+                    await DeleteMaterial(materialId);
+                }
+            }
+            catch (Exception ex)
+            {
+                MessageBox.Show($"Ошибка при удалении материала: {ex.Message}",
+                    "Ошибка", MessageBoxButtons.OK, MessageBoxIcon.Error);
+            }
+        }
+
+        private async System.Threading.Tasks.Task DeleteMaterial(int materialId)
+        {
+            try
+            {
+                Cursor = Cursors.WaitCursor;
+
+                // Проверяем, используется ли материал в других продуктах
+                var checkQuery = "SELECT COUNT(*) FROM ProductMaterials WHERE MaterialId = @MaterialId AND ProductId <> @CurrentProductId";
+                var checkParam1 = new SqlParameter("@MaterialId", SqlDbType.Int) { Value = materialId };
+                var checkParam2 = new SqlParameter("@CurrentProductId", SqlDbType.Int) { Value = _product.Id };
+
+                var result = await _db.ExecuteScalarAsync(checkQuery, checkParam1, checkParam2);
+                int usageCount = Convert.ToInt32(result);
+
+                if (usageCount > 0)
+                {
+                    // Удаляем только связь с текущим продуктом
+                    var deleteProdMatQuery = "DELETE FROM ProductMaterials WHERE ProductId = @ProductId AND MaterialId = @MaterialId";
+                    var param1 = new SqlParameter("@ProductId", SqlDbType.Int) { Value = _product.Id };
+                    var param2 = new SqlParameter("@MaterialId", SqlDbType.Int) { Value = materialId };
+                    await _db.ExecuteNonQueryAsync(deleteProdMatQuery, param1, param2);
+
+                    MessageBox.Show("Материал был отвязан от данного продукта.\nМатериал используется в других продуктах и не был удален полностью.",
+                        "Информация", MessageBoxButtons.OK, MessageBoxIcon.Information);
+                }
+                else
+                {
+                    // Сначала удаляем связь из ProductMaterials
+                    var deleteProdMatQuery = "DELETE FROM ProductMaterials WHERE ProductId = @ProductId AND MaterialId = @MaterialId";
+                    var param1 = new SqlParameter("@ProductId", SqlDbType.Int) { Value = _product.Id };
+                    var param2 = new SqlParameter("@MaterialId", SqlDbType.Int) { Value = materialId };
+                    await _db.ExecuteNonQueryAsync(deleteProdMatQuery, param1, param2);
+
+                    // Затем удаляем сам материал
+                    var deleteMaterialQuery = "DELETE FROM Materials WHERE Id = @Id";
+                    var param3 = new SqlParameter("@Id", SqlDbType.Int) { Value = materialId };
+                    await _db.ExecuteNonQueryAsync(deleteMaterialQuery, param3);
+
+                    MessageBox.Show("Материал успешно удален.",
+                        "Успех", MessageBoxButtons.OK, MessageBoxIcon.Information);
+                }
+
+                LoadMaterials();
+            }
+            catch (SqlException sqlEx)
+            {
+                string errorMessage = "Ошибка базы данных при удалении материала.";
+                if (sqlEx.Number == 547) // Foreign key constraint violation
+                {
+                    errorMessage = "Невозможно удалить материал: он используется в других записях.";
+                }
+                MessageBox.Show($"{errorMessage}\n\nТехническая информация: {sqlEx.Message}",
+                    "Ошибка базы данных", MessageBoxButtons.OK, MessageBoxIcon.Error);
+            }
+            catch (Exception ex)
+            {
+                MessageBox.Show($"Произошла непредвиденная ошибка при удалении: {ex.Message}",
+                    "Ошибка", MessageBoxButtons.OK, MessageBoxIcon.Error);
+            }
+            finally
+            {
+                Cursor = Cursors.Default;
             }
         }
 
@@ -368,21 +583,6 @@ namespace Our_decor.Forms
                 );
                 pictureBoxLogo.BringToFront();
             }
-        }
-
-        protected override void Dispose(bool disposing)
-        {
-            if (disposing)
-            {
-                if (components != null)
-                    components.Dispose();
-
-                if (pictureBoxLogo?.Image != null)
-                    pictureBoxLogo.Image.Dispose();
-
-                _timer?.Dispose();
-            }
-            base.Dispose(disposing);
         }
     }
 }

@@ -95,10 +95,10 @@
             // 
             this.cmbMaterialType.DropDownStyle = System.Windows.Forms.ComboBoxStyle.DropDownList;
             this.cmbMaterialType.Font = new System.Drawing.Font("Gabriola", 12F);
-            this.cmbMaterialType.Location = new System.Drawing.Point(178, 74);
+            this.cmbMaterialType.Location = new System.Drawing.Point(190, 74);
             this.cmbMaterialType.Margin = new System.Windows.Forms.Padding(4);
             this.cmbMaterialType.Name = "cmbMaterialType";
-            this.cmbMaterialType.Size = new System.Drawing.Size(447, 45);
+            this.cmbMaterialType.Size = new System.Drawing.Size(435, 45);
             this.cmbMaterialType.TabIndex = 2;
             // 
             // lblMaterialName
@@ -115,10 +115,10 @@
             // txtMaterialName
             // 
             this.txtMaterialName.Font = new System.Drawing.Font("Gabriola", 12F);
-            this.txtMaterialName.Location = new System.Drawing.Point(178, 123);
+            this.txtMaterialName.Location = new System.Drawing.Point(190, 123);
             this.txtMaterialName.Margin = new System.Windows.Forms.Padding(4);
             this.txtMaterialName.Name = "txtMaterialName";
-            this.txtMaterialName.Size = new System.Drawing.Size(447, 41);
+            this.txtMaterialName.Size = new System.Drawing.Size(435, 41);
             this.txtMaterialName.TabIndex = 4;
             // 
             // lblQuantity
@@ -135,10 +135,10 @@
             // txtQuantity
             // 
             this.txtQuantity.Font = new System.Drawing.Font("Gabriola", 12F);
-            this.txtQuantity.Location = new System.Drawing.Point(178, 172);
+            this.txtQuantity.Location = new System.Drawing.Point(190, 172);
             this.txtQuantity.Margin = new System.Windows.Forms.Padding(4);
             this.txtQuantity.Name = "txtQuantity";
-            this.txtQuantity.Size = new System.Drawing.Size(447, 41);
+            this.txtQuantity.Size = new System.Drawing.Size(435, 41);
             this.txtQuantity.TabIndex = 6;
             // 
             // lblCost
@@ -155,10 +155,10 @@
             // txtCost
             // 
             this.txtCost.Font = new System.Drawing.Font("Gabriola", 12F);
-            this.txtCost.Location = new System.Drawing.Point(178, 222);
+            this.txtCost.Location = new System.Drawing.Point(190, 222);
             this.txtCost.Margin = new System.Windows.Forms.Padding(4);
             this.txtCost.Name = "txtCost";
-            this.txtCost.Size = new System.Drawing.Size(447, 41);
+            this.txtCost.Size = new System.Drawing.Size(435, 41);
             this.txtCost.TabIndex = 8;
             // 
             // lblUnit
@@ -175,10 +175,10 @@
             // txtUnit
             // 
             this.txtUnit.Font = new System.Drawing.Font("Gabriola", 12F);
-            this.txtUnit.Location = new System.Drawing.Point(200, 271);
+            this.txtUnit.Location = new System.Drawing.Point(214, 271);
             this.txtUnit.Margin = new System.Windows.Forms.Padding(4);
             this.txtUnit.Name = "txtUnit";
-            this.txtUnit.Size = new System.Drawing.Size(425, 41);
+            this.txtUnit.Size = new System.Drawing.Size(411, 41);
             this.txtUnit.TabIndex = 10;
             // 
             // lblStockQuantity
@@ -195,10 +195,10 @@
             // txtStockQuantity
             // 
             this.txtStockQuantity.Font = new System.Drawing.Font("Gabriola", 12F);
-            this.txtStockQuantity.Location = new System.Drawing.Point(218, 320);
+            this.txtStockQuantity.Location = new System.Drawing.Point(226, 320);
             this.txtStockQuantity.Margin = new System.Windows.Forms.Padding(4);
             this.txtStockQuantity.Name = "txtStockQuantity";
-            this.txtStockQuantity.Size = new System.Drawing.Size(407, 41);
+            this.txtStockQuantity.Size = new System.Drawing.Size(399, 41);
             this.txtStockQuantity.TabIndex = 12;
             // 
             // lblMinQuantity
@@ -215,10 +215,10 @@
             // txtMinQuantity
             // 
             this.txtMinQuantity.Font = new System.Drawing.Font("Gabriola", 12F);
-            this.txtMinQuantity.Location = new System.Drawing.Point(248, 369);
+            this.txtMinQuantity.Location = new System.Drawing.Point(260, 369);
             this.txtMinQuantity.Margin = new System.Windows.Forms.Padding(4);
             this.txtMinQuantity.Name = "txtMinQuantity";
-            this.txtMinQuantity.Size = new System.Drawing.Size(377, 41);
+            this.txtMinQuantity.Size = new System.Drawing.Size(365, 41);
             this.txtMinQuantity.TabIndex = 14;
             // 
             // btnSave

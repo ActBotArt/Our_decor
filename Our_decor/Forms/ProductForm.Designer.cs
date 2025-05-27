@@ -34,6 +34,10 @@
             this.btnSave = new System.Windows.Forms.Button();
             this.btnCancel = new System.Windows.Forms.Button();
 
+            // Добавляем метки для ошибок
+            this.lblNameError = new System.Windows.Forms.Label();
+            this.lblPriceError = new System.Windows.Forms.Label();
+
             this.panelTop.SuspendLayout();
             ((System.ComponentModel.ISupportInitialize)(this.numMinCost)).BeginInit();
             ((System.ComponentModel.ISupportInitialize)(this.numWidth)).BeginInit();
@@ -97,43 +101,63 @@
             this.txtName.Location = new System.Drawing.Point(150, 140);
             this.txtName.Size = new System.Drawing.Size(320, 30);
 
+            // lblNameError - метка ошибки для названия
+            this.lblNameError.AutoSize = true;
+            this.lblNameError.Font = new System.Drawing.Font("Gabriola", 10F);
+            this.lblNameError.ForeColor = System.Drawing.Color.Red;
+            this.lblNameError.Location = new System.Drawing.Point(150, 170);
+            this.lblNameError.Size = new System.Drawing.Size(320, 15);
+            this.lblNameError.Text = "";
+            this.lblNameError.Visible = false;
+
             // lblDescription
             this.lblDescription.AutoSize = true;
             this.lblDescription.Font = new System.Drawing.Font("Gabriola", 14F);
-            this.lblDescription.Location = new System.Drawing.Point(20, 180);
+            this.lblDescription.Location = new System.Drawing.Point(20, 190);
             this.lblDescription.Text = "Описание:";
 
             // txtDescription
             this.txtDescription.Font = new System.Drawing.Font("Gabriola", 12F);
-            this.txtDescription.Location = new System.Drawing.Point(150, 180);
+            this.txtDescription.Location = new System.Drawing.Point(150, 190);
             this.txtDescription.Size = new System.Drawing.Size(320, 60);
             this.txtDescription.Multiline = true;
 
             // lblMinCost
             this.lblMinCost.AutoSize = true;
             this.lblMinCost.Font = new System.Drawing.Font("Gabriola", 14F);
-            this.lblMinCost.Location = new System.Drawing.Point(20, 250);
+            this.lblMinCost.Location = new System.Drawing.Point(20, 260);
             this.lblMinCost.Text = "Мин. стоимость:";
 
             // numMinCost
             this.numMinCost.Font = new System.Drawing.Font("Gabriola", 12F);
-            this.numMinCost.Location = new System.Drawing.Point(150, 250);
+            this.numMinCost.Location = new System.Drawing.Point(150, 260);
             this.numMinCost.Size = new System.Drawing.Size(150, 30);
             this.numMinCost.DecimalPlaces = 2;
             this.numMinCost.Maximum = 1000000;
+            this.numMinCost.Minimum = 0.01M;
+
+            // lblPriceError - метка ошибки для цены
+            this.lblPriceError.AutoSize = true;
+            this.lblPriceError.Font = new System.Drawing.Font("Gabriola", 10F);
+            this.lblPriceError.ForeColor = System.Drawing.Color.Red;
+            this.lblPriceError.Location = new System.Drawing.Point(310, 265);
+            this.lblPriceError.Size = new System.Drawing.Size(160, 15);
+            this.lblPriceError.Text = "";
+            this.lblPriceError.Visible = false;
 
             // lblWidth
             this.lblWidth.AutoSize = true;
             this.lblWidth.Font = new System.Drawing.Font("Gabriola", 14F);
-            this.lblWidth.Location = new System.Drawing.Point(20, 290);
+            this.lblWidth.Location = new System.Drawing.Point(20, 300);
             this.lblWidth.Text = "Ширина рулона:";
 
             // numWidth
             this.numWidth.Font = new System.Drawing.Font("Gabriola", 12F);
-            this.numWidth.Location = new System.Drawing.Point(150, 290);
+            this.numWidth.Location = new System.Drawing.Point(150, 300);
             this.numWidth.Size = new System.Drawing.Size(150, 30);
             this.numWidth.DecimalPlaces = 2;
             this.numWidth.Maximum = 10;
+            this.numWidth.Minimum = 0.01M;
             this.numWidth.Increment = 0.01M;
 
             // btnSave
@@ -142,7 +166,7 @@
             this.btnSave.FlatAppearance.BorderSize = 0;
             this.btnSave.Font = new System.Drawing.Font("Gabriola", 14F);
             this.btnSave.ForeColor = System.Drawing.Color.White;
-            this.btnSave.Location = new System.Drawing.Point(100, 340);
+            this.btnSave.Location = new System.Drawing.Point(100, 350);
             this.btnSave.Size = new System.Drawing.Size(140, 40);
             this.btnSave.Text = "Сохранить";
             this.btnSave.Click += new System.EventHandler(this.btnSave_Click);
@@ -153,7 +177,7 @@
             this.btnCancel.FlatAppearance.BorderSize = 0;
             this.btnCancel.Font = new System.Drawing.Font("Gabriola", 14F);
             this.btnCancel.ForeColor = System.Drawing.Color.White;
-            this.btnCancel.Location = new System.Drawing.Point(260, 340);
+            this.btnCancel.Location = new System.Drawing.Point(260, 350);
             this.btnCancel.Size = new System.Drawing.Size(140, 40);
             this.btnCancel.Text = "Отмена";
             this.btnCancel.Click += new System.EventHandler(this.btnCancel_Click);
@@ -162,7 +186,7 @@
             this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
             this.BackColor = System.Drawing.Color.FromArgb(187, 217, 178);
-            this.ClientSize = new System.Drawing.Size(500, 400);
+            this.ClientSize = new System.Drawing.Size(500, 420);
             this.Controls.Add(this.panelTop);
             this.Controls.Add(this.lblArticle);
             this.Controls.Add(this.txtArticle);
@@ -170,10 +194,12 @@
             this.Controls.Add(this.cmbType);
             this.Controls.Add(this.lblName);
             this.Controls.Add(this.txtName);
+            this.Controls.Add(this.lblNameError);
             this.Controls.Add(this.lblDescription);
             this.Controls.Add(this.txtDescription);
             this.Controls.Add(this.lblMinCost);
             this.Controls.Add(this.numMinCost);
+            this.Controls.Add(this.lblPriceError);
             this.Controls.Add(this.lblWidth);
             this.Controls.Add(this.numWidth);
             this.Controls.Add(this.btnSave);
@@ -184,6 +210,7 @@
             // Подписка на события валидации
             this.txtArticle.TextChanged += new System.EventHandler(this.ValidateInput);
             this.txtName.TextChanged += new System.EventHandler(this.ValidateInput);
+            this.txtName.KeyPress += new System.Windows.Forms.KeyPressEventHandler(this.txtName_KeyPress);
             this.cmbType.SelectedIndexChanged += new System.EventHandler(this.ValidateInput);
             this.numMinCost.ValueChanged += new System.EventHandler(this.ValidateInput);
             this.numWidth.ValueChanged += new System.EventHandler(this.ValidateInput);
@@ -205,10 +232,12 @@
         private System.Windows.Forms.ComboBox cmbType;
         private System.Windows.Forms.Label lblName;
         private System.Windows.Forms.TextBox txtName;
+        private System.Windows.Forms.Label lblNameError;
         private System.Windows.Forms.Label lblDescription;
         private System.Windows.Forms.TextBox txtDescription;
         private System.Windows.Forms.Label lblMinCost;
         private System.Windows.Forms.NumericUpDown numMinCost;
+        private System.Windows.Forms.Label lblPriceError;
         private System.Windows.Forms.Label lblWidth;
         private System.Windows.Forms.NumericUpDown numWidth;
         private System.Windows.Forms.Button btnSave;

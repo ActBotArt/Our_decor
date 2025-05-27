@@ -1,31 +1,54 @@
-﻿namespace Our_decor.Forms
+﻿// MaterialsForm.Designer.cs
+using System;
+using System.Windows.Forms;
+using System.Drawing;
+
+namespace Our_decor.Forms
 {
     partial class MaterialsForm
     {
         private System.ComponentModel.IContainer components = null;
-        private System.Windows.Forms.Panel panelTop;
-        private System.Windows.Forms.Label lblTitle;
-        private System.Windows.Forms.Button btnClose;
-        private System.Windows.Forms.DataGridView dataGridView;
-        private System.Windows.Forms.Label lblTotal;
-        private System.Windows.Forms.PictureBox pictureBoxLogo;
-        private System.Windows.Forms.Button btnAdd;
-        private System.Windows.Forms.StatusStrip statusStrip;
-        private System.Windows.Forms.ToolStripStatusLabel lblDateTime;
-        private System.Windows.Forms.ToolStripStatusLabel lblUser;
+        private Panel panelTop;
+        private Label lblTitle;
+        private Button btnClose;
+        private DataGridView dataGridView;
+        private Label lblTotal;
+        private PictureBox pictureBoxLogo;
+        private Button btnAdd;
+        private Button btnDelete;
+        private StatusStrip statusStrip;
+        private ToolStripStatusLabel lblDateTime;
+        private ToolStripStatusLabel lblUser;
 
+        /// <summary> 
+        /// Освободить все используемые ресурсы.
+        /// </summary>
+        protected override void Dispose(bool disposing)
+        {
+            if (disposing && (components != null))
+            {
+                components.Dispose();
+            }
+            base.Dispose(disposing);
+        }
+
+        /// <summary> 
+        /// Требуемый метод для поддержки конструктора — не изменяйте 
+        /// содержимое этого метода с помощью редактора кода.
+        /// </summary>
         private void InitializeComponent()
         {
-            this.panelTop = new System.Windows.Forms.Panel();
-            this.lblTitle = new System.Windows.Forms.Label();
-            this.btnClose = new System.Windows.Forms.Button();
-            this.dataGridView = new System.Windows.Forms.DataGridView();
-            this.lblTotal = new System.Windows.Forms.Label();
-            this.pictureBoxLogo = new System.Windows.Forms.PictureBox();
-            this.btnAdd = new System.Windows.Forms.Button();
-            this.statusStrip = new System.Windows.Forms.StatusStrip();
-            this.lblDateTime = new System.Windows.Forms.ToolStripStatusLabel();
-            this.lblUser = new System.Windows.Forms.ToolStripStatusLabel();
+            this.panelTop = new Panel();
+            this.lblTitle = new Label();
+            this.btnClose = new Button();
+            this.dataGridView = new DataGridView();
+            this.lblTotal = new Label();
+            this.pictureBoxLogo = new PictureBox();
+            this.btnAdd = new Button();
+            this.btnDelete = new Button();
+            this.statusStrip = new StatusStrip();
+            this.lblDateTime = new ToolStripStatusLabel();
+            this.lblUser = new ToolStripStatusLabel();
 
             ((System.ComponentModel.ISupportInitialize)(this.dataGridView)).BeginInit();
             ((System.ComponentModel.ISupportInitialize)(this.pictureBoxLogo)).BeginInit();
@@ -33,122 +56,174 @@
             this.statusStrip.SuspendLayout();
             this.SuspendLayout();
 
-            this.panelTop.BackColor = System.Drawing.Color.FromArgb(((int)(((byte)(187)))), ((int)(((byte)(217)))), ((int)(((byte)(178)))));
+            // 
+            // panelTop
+            // 
+            this.panelTop.BackColor = Color.FromArgb(187, 217, 178);
             this.panelTop.Controls.Add(this.lblTitle);
             this.panelTop.Controls.Add(this.btnClose);
-            this.panelTop.Dock = System.Windows.Forms.DockStyle.Top;
-            this.panelTop.Location = new System.Drawing.Point(0, 0);
+            this.panelTop.Dock = DockStyle.Top;
+            this.panelTop.Location = new Point(0, 0);
             this.panelTop.Name = "panelTop";
-            this.panelTop.Size = new System.Drawing.Size(800, 45);
+            this.panelTop.Size = new Size(800, 45);
             this.panelTop.TabIndex = 0;
-            this.panelTop.Padding = new System.Windows.Forms.Padding(12, 5, 120, 5);
+            this.panelTop.Padding = new Padding(12, 5, 120, 5);
+            this.panelTop.MouseDown += new MouseEventHandler(this.PanelTop_MouseDown);
+            this.panelTop.MouseMove += new MouseEventHandler(this.PanelTop_MouseMove);
+            this.panelTop.MouseUp += new MouseEventHandler(this.PanelTop_MouseUp);
 
+            // 
+            // lblTitle
+            // 
             this.lblTitle.AutoSize = true;
-            this.lblTitle.Font = new System.Drawing.Font("Gabriola", 16F, System.Drawing.FontStyle.Bold);
-            this.lblTitle.ForeColor = System.Drawing.Color.FromArgb(((int)(((byte)(45)))), ((int)(((byte)(96)))), ((int)(((byte)(51)))));
-            this.lblTitle.Location = new System.Drawing.Point(12, 5);
+            this.lblTitle.Font = new Font("Gabriola", 16F, FontStyle.Bold);
+            this.lblTitle.ForeColor = Color.FromArgb(45, 96, 51);
+            this.lblTitle.Location = new Point(12, 5);
             this.lblTitle.Name = "lblTitle";
-            this.lblTitle.Size = new System.Drawing.Size(200, 35);
+            this.lblTitle.Size = new Size(200, 35);
             this.lblTitle.TabIndex = 0;
             this.lblTitle.Text = "Материалы";
 
-            this.btnClose.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Right)));
-            this.btnClose.BackColor = System.Drawing.Color.FromArgb(((int)(((byte)(45)))), ((int)(((byte)(96)))), ((int)(((byte)(51)))));
-            this.btnClose.FlatStyle = System.Windows.Forms.FlatStyle.Flat;
-            this.btnClose.Font = new System.Drawing.Font("Gabriola", 14F);
-            this.btnClose.ForeColor = System.Drawing.Color.White;
-            this.btnClose.Location = new System.Drawing.Point(688, 5);
+            // 
+            // btnClose
+            // 
+            this.btnClose.Anchor = AnchorStyles.Top | AnchorStyles.Right;
+            this.btnClose.BackColor = Color.FromArgb(45, 96, 51);
+            this.btnClose.FlatStyle = FlatStyle.Flat;
+            this.btnClose.Font = new Font("Gabriola", 14F);
+            this.btnClose.ForeColor = Color.White;
+            this.btnClose.Location = new Point(688, 5);
             this.btnClose.Name = "btnClose";
-            this.btnClose.Size = new System.Drawing.Size(100, 35);
+            this.btnClose.Size = new Size(100, 35);
             this.btnClose.TabIndex = 1;
             this.btnClose.Text = "Закрыть";
             this.btnClose.UseVisualStyleBackColor = false;
             this.btnClose.FlatAppearance.BorderSize = 0;
-            this.btnClose.Click += new System.EventHandler(this.btnClose_Click);
+            this.btnClose.Click += new EventHandler(this.btnClose_Click);
 
-            this.btnAdd.BackColor = System.Drawing.Color.FromArgb(((int)(((byte)(45)))), ((int)(((byte)(96)))), ((int)(((byte)(51)))));
-            this.btnAdd.FlatStyle = System.Windows.Forms.FlatStyle.Flat;
-            this.btnAdd.Font = new System.Drawing.Font("Gabriola", 14F);
-            this.btnAdd.ForeColor = System.Drawing.Color.White;
-            this.btnAdd.Location = new System.Drawing.Point(12, 50);
+            // 
+            // btnAdd
+            // 
+            this.btnAdd.BackColor = Color.FromArgb(45, 96, 51);
+            this.btnAdd.FlatStyle = FlatStyle.Flat;
+            this.btnAdd.Font = new Font("Gabriola", 14F);
+            this.btnAdd.ForeColor = Color.White;
+            this.btnAdd.Location = new Point(12, 50);
             this.btnAdd.Name = "btnAdd";
-            this.btnAdd.Size = new System.Drawing.Size(150, 35);
+            this.btnAdd.Size = new Size(150, 35);
             this.btnAdd.TabIndex = 2;
             this.btnAdd.Text = "Добавить материал";
             this.btnAdd.UseVisualStyleBackColor = false;
             this.btnAdd.FlatAppearance.BorderSize = 0;
-            this.btnAdd.Click += new System.EventHandler(this.btnAdd_Click);
+            this.btnAdd.Click += new EventHandler(this.btnAdd_Click);
             this.btnAdd.Visible = false;
 
-            this.dataGridView.Anchor = ((System.Windows.Forms.AnchorStyles)((((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Bottom)
-            | System.Windows.Forms.AnchorStyles.Left)
-            | System.Windows.Forms.AnchorStyles.Right)));
-            this.dataGridView.BackgroundColor = System.Drawing.Color.White;
-            this.dataGridView.BorderStyle = System.Windows.Forms.BorderStyle.None;
-            this.dataGridView.Location = new System.Drawing.Point(12, 90);
+            // 
+            // btnDelete
+            // 
+            this.btnDelete.BackColor = Color.FromArgb(45, 96, 51);
+            this.btnDelete.FlatStyle = FlatStyle.Flat;
+            this.btnDelete.Font = new Font("Gabriola", 14F);
+            this.btnDelete.ForeColor = Color.White;
+            this.btnDelete.Location = new Point(170, 50);
+            this.btnDelete.Name = "btnDelete";
+            this.btnDelete.Size = new Size(150, 35);
+            this.btnDelete.TabIndex = 7;
+            this.btnDelete.Text = "Удалить материал";
+            this.btnDelete.UseVisualStyleBackColor = false;
+            this.btnDelete.FlatAppearance.BorderSize = 0;
+            this.btnDelete.Click += new EventHandler(this.btnDelete_Click);
+            this.btnDelete.Visible = false;
+
+            // 
+            // dataGridView
+            // 
+            this.dataGridView.Anchor = AnchorStyles.Top | AnchorStyles.Bottom | AnchorStyles.Left | AnchorStyles.Right;
+            this.dataGridView.BackgroundColor = Color.White;
+            this.dataGridView.BorderStyle = BorderStyle.None;
+            this.dataGridView.Location = new Point(12, 90);
             this.dataGridView.Name = "dataGridView";
-            this.dataGridView.Size = new System.Drawing.Size(776, 430);
+            this.dataGridView.Size = new Size(776, 430);
             this.dataGridView.TabIndex = 3;
             this.dataGridView.RowHeadersVisible = false;
 
-            this.lblTotal.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Left)));
+            // 
+            // lblTotal
+            // 
+            this.lblTotal.Anchor = AnchorStyles.Bottom | AnchorStyles.Left;
             this.lblTotal.AutoSize = true;
-            this.lblTotal.Font = new System.Drawing.Font("Gabriola", 14F);
-            this.lblTotal.ForeColor = System.Drawing.Color.FromArgb(((int)(((byte)(45)))), ((int)(((byte)(96)))), ((int)(((byte)(51)))));
-            this.lblTotal.Location = new System.Drawing.Point(12, 530);
+            this.lblTotal.Font = new Font("Gabriola", 14F);
+            this.lblTotal.ForeColor = Color.FromArgb(45, 96, 51);
+            this.lblTotal.Location = new Point(12, 530);
             this.lblTotal.Name = "lblTotal";
-            this.lblTotal.Size = new System.Drawing.Size(144, 35);
+            this.lblTotal.Size = new Size(200, 35);
             this.lblTotal.TabIndex = 4;
             this.lblTotal.Text = "Всего материалов: 0";
 
-            this.pictureBoxLogo.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Right)));
-            this.pictureBoxLogo.BackColor = System.Drawing.Color.Transparent;
-            this.pictureBoxLogo.Location = new System.Drawing.Point(668, 458);
+            // 
+            // pictureBoxLogo
+            // 
+            this.pictureBoxLogo.Anchor = AnchorStyles.Bottom | AnchorStyles.Right;
+            this.pictureBoxLogo.BackColor = Color.Transparent;
+            this.pictureBoxLogo.Location = new Point(668, 458);
             this.pictureBoxLogo.Name = "pictureBoxLogo";
-            this.pictureBoxLogo.Size = new System.Drawing.Size(120, 100);
-            this.pictureBoxLogo.SizeMode = System.Windows.Forms.PictureBoxSizeMode.Zoom;
+            this.pictureBoxLogo.Size = new Size(120, 100);
+            this.pictureBoxLogo.SizeMode = PictureBoxSizeMode.Zoom;
             this.pictureBoxLogo.TabIndex = 5;
             this.pictureBoxLogo.TabStop = false;
 
-            this.statusStrip.BackColor = System.Drawing.Color.FromArgb(((int)(((byte)(187)))), ((int)(((byte)(217)))), ((int)(((byte)(178)))));
-            this.statusStrip.Items.AddRange(new System.Windows.Forms.ToolStripItem[] {
+            // 
+            // statusStrip
+            // 
+            this.statusStrip.BackColor = Color.FromArgb(187, 217, 178);
+            this.statusStrip.Items.AddRange(new ToolStripItem[] {
                 this.lblDateTime,
-                new System.Windows.Forms.ToolStripSeparator(),
-                this.lblUser});
-            this.statusStrip.Location = new System.Drawing.Point(0, 578);
+                new ToolStripSeparator(),
+                this.lblUser
+            });
+            this.statusStrip.Location = new Point(0, 578);
             this.statusStrip.Name = "statusStrip";
-            this.statusStrip.Size = new System.Drawing.Size(800, 22);
+            this.statusStrip.Size = new Size(800, 22);
             this.statusStrip.TabIndex = 6;
             this.statusStrip.SizingGrip = false;
 
-            this.lblDateTime.Font = new System.Drawing.Font("Segoe UI", 9F);
+            // 
+            // lblDateTime
+            // 
+            this.lblDateTime.Font = new Font("Segoe UI", 9F);
+            this.lblDateTime.ForeColor = Color.FromArgb(45, 96, 51);
             this.lblDateTime.Name = "lblDateTime";
-            this.lblDateTime.Size = new System.Drawing.Size(350, 17);
-            this.lblDateTime.Text = "Current Date and Time (UTC): ";
-            this.lblDateTime.Padding = new System.Windows.Forms.Padding(5, 0, 0, 0);
+            this.lblDateTime.Size = new Size(350, 17);
+            this.lblDateTime.Text = "Дата и время (UTC): ";
 
-            this.lblUser.Font = new System.Drawing.Font("Segoe UI", 9F);
+            // 
+            // lblUser
+            // 
+            this.lblUser.Font = new Font("Segoe UI", 9F);
+            this.lblUser.ForeColor = Color.FromArgb(45, 96, 51);
             this.lblUser.Name = "lblUser";
-            this.lblUser.Size = new System.Drawing.Size(200, 17);
-            this.lblUser.Text = "Current User's Login: ";
-            this.lblUser.Padding = new System.Windows.Forms.Padding(15, 0, 0, 0);
+            this.lblUser.Size = new Size(200, 17);
+            this.lblUser.Text = "Пользователь: ";
 
-            this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
-            this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
-            this.BackColor = System.Drawing.Color.White;
-            this.ClientSize = new System.Drawing.Size(800, 600);
+            // 
+            // MaterialsForm
+            // 
+            this.AutoScaleDimensions = new SizeF(6F, 13F);
+            this.AutoScaleMode = AutoScaleMode.Font;
+            this.BackColor = Color.White;
+            this.ClientSize = new Size(800, 600);
             this.Controls.Add(this.statusStrip);
             this.Controls.Add(this.pictureBoxLogo);
             this.Controls.Add(this.lblTotal);
             this.Controls.Add(this.dataGridView);
+            this.Controls.Add(this.btnDelete);
             this.Controls.Add(this.btnAdd);
             this.Controls.Add(this.panelTop);
-            this.FormBorderStyle = System.Windows.Forms.FormBorderStyle.None;
-            this.MinimumSize = new System.Drawing.Size(800, 600);
+            this.FormBorderStyle = FormBorderStyle.None;
+            this.MinimumSize = new Size(800, 600);
             this.Name = "MaterialsForm";
-            this.StartPosition = System.Windows.Forms.FormStartPosition.CenterParent;
+            this.StartPosition = FormStartPosition.CenterParent;
             this.Text = "Материалы";
-
             ((System.ComponentModel.ISupportInitialize)(this.dataGridView)).EndInit();
             ((System.ComponentModel.ISupportInitialize)(this.pictureBoxLogo)).EndInit();
             this.panelTop.ResumeLayout(false);
