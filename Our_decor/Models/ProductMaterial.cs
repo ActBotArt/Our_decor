@@ -14,8 +14,6 @@ namespace Our_decor.Models
         public int MaterialId { get; set; }
         public decimal Quantity { get; set; }
         public decimal Cost { get; set; }
-
-        // Навигационные свойства
         public string ProductArticle { get; set; }
         public string ProductName { get; set; }
         public string MaterialName { get; set; }
