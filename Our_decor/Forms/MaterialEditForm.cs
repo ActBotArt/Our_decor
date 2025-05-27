@@ -115,11 +115,29 @@ namespace Our_decor.Forms
             }
         }
 
+        // Метод для проверки допустимых символов в текстовых полях
+        private bool IsValidTextInput(string text)
+        {
+            if (string.IsNullOrWhiteSpace(text))
+                return false;
+
+            // Разрешены буквы, цифры, пробелы, дефисы и подчеркивания
+            foreach (char c in text)
+            {
+                if (!char.IsLetterOrDigit(c) && c != ' ' && c != '-' && c != '_')
+                {
+                    return false;
+                }
+            }
+            return true;
+        }
+
         private void ValidateInput(object sender, EventArgs e)
         {
             bool isValid = true;
 
-            if (string.IsNullOrWhiteSpace(txtMaterialName.Text))
+            // Валидация названия материала - разрешены буквы, цифры, пробелы, дефисы и подчеркивания
+            if (!IsValidTextInput(txtMaterialName.Text))
             {
                 isValid = false;
                 txtMaterialName.BackColor = Color.MistyRose;
@@ -129,6 +147,7 @@ namespace Our_decor.Forms
                 txtMaterialName.BackColor = SystemColors.Window;
             }
 
+            // Валидация типа материала
             if (cmbMaterialType.SelectedItem == null)
             {
                 isValid = false;
@@ -139,6 +158,7 @@ namespace Our_decor.Forms
                 cmbMaterialType.BackColor = SystemColors.Window;
             }
 
+            // Валидация количества
             if (!decimal.TryParse(txtQuantity.Text, out decimal quantity) || quantity <= 0)
             {
                 isValid = false;
@@ -149,6 +169,7 @@ namespace Our_decor.Forms
                 txtQuantity.BackColor = SystemColors.Window;
             }
 
+            // Валидация стоимости
             if (!decimal.TryParse(txtCost.Text, out decimal cost) || cost <= 0)
             {
                 isValid = false;
@@ -159,7 +180,8 @@ namespace Our_decor.Forms
                 txtCost.BackColor = SystemColors.Window;
             }
 
-            if (string.IsNullOrWhiteSpace(txtUnit.Text))
+            // Валидация единицы измерения - разрешены буквы, цифры, пробелы, дефисы и подчеркивания
+            if (!IsValidTextInput(txtUnit.Text))
             {
                 isValid = false;
                 txtUnit.BackColor = Color.MistyRose;
@@ -169,6 +191,7 @@ namespace Our_decor.Forms
                 txtUnit.BackColor = SystemColors.Window;
             }
 
+            // Валидация количества на складе
             if (!decimal.TryParse(txtStockQuantity.Text, out decimal stockQuantity) || stockQuantity < 0)
             {
                 isValid = false;
@@ -179,6 +202,7 @@ namespace Our_decor.Forms
                 txtStockQuantity.BackColor = SystemColors.Window;
             }
 
+            // Валидация минимального количества
             if (!decimal.TryParse(txtMinQuantity.Text, out decimal minQuantity) || minQuantity < 0)
             {
                 isValid = false;

@@ -74,6 +74,15 @@ namespace Our_decor.Forms
                 numWidth.Value = 0.01M;
             }
 
+            // Добавляем обработчики валидации для артикула
+            txtArticle.KeyPress += txtArticle_KeyPress;
+            txtArticle.TextChanged += ValidateInput;
+            txtName.KeyPress += txtName_KeyPress;
+            txtName.TextChanged += ValidateInput;
+            cmbType.SelectedIndexChanged += ValidateInput;
+            numMinCost.ValueChanged += ValidateInput;
+            numWidth.ValueChanged += ValidateInput;
+
             // Настройка перетаскивания формы
             panelTop.MouseDown += (s, e) =>
             {
@@ -97,6 +106,45 @@ namespace Our_decor.Forms
             panelTop.MouseUp += (s, e) => _isDragging = false;
 
             ValidateInput(null, EventArgs.Empty);
+        }
+
+        // Проверка символов в артикуле - ТОЛЬКО ЦИФРЫ!
+        private void txtArticle_KeyPress(object sender, KeyPressEventArgs e)
+        {
+            // Разрешаем управляющие символы (Backspace, Delete и т.д.)
+            if (char.IsControl(e.KeyChar))
+            {
+                return;
+            }
+
+            // Разрешаем только цифры!
+            if (!char.IsDigit(e.KeyChar))
+            {
+                e.Handled = true; // Блокируем ввод недопустимого символа
+
+                // Показываем предупреждение через ToolTip
+                ShowValidationError(txtArticle, "В артикуле разрешены только цифры!");
+            }
+        }
+
+        // Проверка артикула на корректность
+        private bool IsValidArticle(string article)
+        {
+            if (string.IsNullOrWhiteSpace(article))
+                return false;
+
+            // Проверяем, что в строке только цифры
+            Regex regex = new Regex(@"^[0-9]+$");
+            return regex.IsMatch(article.Trim());
+        }
+
+        // Показать ошибку валидации через ToolTip
+        private void ShowValidationError(Control control, string message)
+        {
+            control.BackColor = Color.MistyRose;
+
+            ToolTip toolTip = new ToolTip();
+            toolTip.Show(message, control, 0, control.Height, 3000);
         }
 
         private async void LoadProductTypes()
@@ -141,7 +189,7 @@ namespace Our_decor.Forms
             }
         }
 
-        // Проверка символов в названии - только буквы и цифры
+        // Проверка символов в названии - буквы, цифры, пробелы, подчеркивания, звездочки и дефисы
         private void txtName_KeyPress(object sender, KeyPressEventArgs e)
         {
             // Разрешаем управляющие символы (Backspace, Delete и т.д.)
@@ -150,24 +198,13 @@ namespace Our_decor.Forms
                 return;
             }
 
-            // Разрешаем только буквы (русские и английские), цифры и пробел
-            if (!char.IsLetterOrDigit(e.KeyChar) && e.KeyChar != ' ')
+            // ИСПРАВЛЕНО: Разрешаем буквы (русские и английские), цифры, пробел, подчеркивание, звездочку и дефис
+            if (!char.IsLetterOrDigit(e.KeyChar) && e.KeyChar != ' ' && e.KeyChar != '_' && e.KeyChar != '*' && e.KeyChar != '-')
             {
                 e.Handled = true; // Блокируем ввод недопустимого символа
 
-                // Показываем предупреждение
-                ShowNameError("Разрешены только буквы, цифры и пробелы!");
-
-                // Автоматически скрываем сообщение через 3 секунды
-                var timer = new Timer();
-                timer.Interval = 3000;
-                timer.Tick += (s, args) =>
-                {
-                    HideNameError();
-                    timer.Stop();
-                    timer.Dispose();
-                };
-                timer.Start();
+                // Показываем предупреждение через ToolTip
+                ShowValidationError(txtName, "Разрешены только буквы, цифры, пробелы, подчеркивания, звездочки и дефисы!");
             }
         }
 
@@ -177,47 +214,17 @@ namespace Our_decor.Forms
             if (string.IsNullOrWhiteSpace(name))
                 return false;
 
-            // Проверяем, что в строке только буквы, цифры и пробелы
-            Regex regex = new Regex(@"^[а-яёА-ЯЁa-zA-Z0-9\s]+$");
+            // ИСПРАВЛЕНО: Проверяем, что в строке только буквы, цифры, пробелы, подчеркивания, звездочки и дефисы
+            Regex regex = new Regex(@"^[а-яёА-ЯЁa-zA-Z0-9\s_*-]+$");
             return regex.IsMatch(name.Trim());
-        }
-
-        // Показать ошибку названия
-        private void ShowNameError(string message)
-        {
-            lblNameError.Text = message;
-            lblNameError.Visible = true;
-            txtName.BackColor = Color.MistyRose;
-        }
-
-        // Скрыть ошибку названия
-        private void HideNameError()
-        {
-            lblNameError.Visible = false;
-            lblNameError.Text = "";
-        }
-
-        // Показать ошибку цены
-        private void ShowPriceError(string message)
-        {
-            lblPriceError.Text = message;
-            lblPriceError.Visible = true;
-            numMinCost.BackColor = Color.MistyRose;
-        }
-
-        // Скрыть ошибку цены
-        private void HidePriceError()
-        {
-            lblPriceError.Visible = false;
-            lblPriceError.Text = "";
         }
 
         private void ValidateInput(object sender, EventArgs e)
         {
             bool isValid = true;
 
-            // Проверка артикула
-            if (string.IsNullOrWhiteSpace(txtArticle.Text))
+            // Проверка артикула - ТОЛЬКО ЦИФРЫ!
+            if (!IsValidArticle(txtArticle.Text))
             {
                 isValid = false;
                 txtArticle.BackColor = Color.MistyRose;
@@ -231,19 +238,11 @@ namespace Our_decor.Forms
             if (!IsValidName(txtName.Text))
             {
                 isValid = false;
-                if (string.IsNullOrWhiteSpace(txtName.Text))
-                {
-                    ShowNameError("Название не может быть пустым!");
-                }
-                else
-                {
-                    ShowNameError("Недопустимые символы в названии!");
-                }
+                txtName.BackColor = Color.MistyRose;
             }
             else
             {
                 txtName.BackColor = SystemColors.Window;
-                HideNameError();
             }
 
             // Проверка типа продукта
@@ -261,17 +260,16 @@ namespace Our_decor.Forms
             if (numMinCost.Value <= 0)
             {
                 isValid = false;
-                ShowPriceError("Цена обязательна!");
+                numMinCost.BackColor = Color.MistyRose;
             }
             else if (numMinCost.Value < 0.01M)
             {
                 isValid = false;
-                ShowPriceError("Минимальная цена 0.01!");
+                numMinCost.BackColor = Color.MistyRose;
             }
             else
             {
                 numMinCost.BackColor = SystemColors.Window;
-                HidePriceError();
             }
 
             // Проверка ширины рулона
@@ -291,9 +289,17 @@ namespace Our_decor.Forms
         private async void btnSave_Click(object sender, EventArgs e)
         {
             // Дополнительная проверка перед сохранением
+            if (!IsValidArticle(txtArticle.Text))
+            {
+                MessageBox.Show("Артикул должен содержать только цифры!",
+                    "Ошибка валидации", MessageBoxButtons.OK, MessageBoxIcon.Warning);
+                txtArticle.Focus();
+                return;
+            }
+
             if (!IsValidName(txtName.Text))
             {
-                MessageBox.Show("Название продукта содержит недопустимые символы!\nРазрешены только буквы, цифры и пробелы.",
+                MessageBox.Show("Название продукта содержит недопустимые символы!\nРазрешены только буквы, цифры, пробелы, подчеркивания, звездочки и дефисы.",
                     "Ошибка валидации", MessageBoxButtons.OK, MessageBoxIcon.Warning);
                 txtName.Focus();
                 return;
